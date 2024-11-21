@@ -1,0 +1,44 @@
+{
+  "name": "vitereact",
+  "version": "0.0.0",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.13.3",
+    "@emotion/styled": "^11.13.0",
+    "@mui/icons-material": "^6.1.6",
+    "@mui/material": "^6.1.6",
+    "@mui/x-charts": "^7.22.2",
+    "@tailwindcss/line-clamp": "^0.4.4",
+    "axios": "^1.7.7",
+    "bootstrap": "^5.3.3",
+    "chart.js": "^4.4.6",
+    "chartjs-plugin-datalabels": "^2.2.0",
+    "file-saver": "^2.0.5",
+    "flowbite-react": "^0.10.2",
+    "framer-motion": "^6.2.6",
+    "hoist-non-react-statics": "^3.3.2",
+    "html2pdf.js": "^0.9.3",
+    "jspdf": "^2.5.2",
+    "pdfreader": "^1.2.14",
+    "react": "^18.3.1",
+    "react-awesome-button": "^6.5.1",
+    "react-bootstrap": "^2.10.5",
+    "react-chartjs-2": "^5.2.0",
+    "react-dom": "^18.3.1",
+    "react-loader-spinner": "^5.1.2",
+    "react-responsive": "^9.0.0-beta.6",
+    "react-router-dom": "^6.28.0",
+    "react-tabs": "^3.2.3"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^1.0.7",
+    "autoprefixer": "^10.4.2",
+    "postcss": "^8.4.5",
+    "tailwindcss": "^3.0.13",
+    "vite": "^2.7.2"
+  }
+}

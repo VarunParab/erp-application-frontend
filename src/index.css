@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* Add this CSS to your project */
+  /* Ensure page breaks after each chart */
+/* Add this to your global styles or the component file */
+/* Global styles to ensure each chart is on a new page and properly aligned */
+/* Ensure charts are on separate pages but retain the grid layout on the screen */
+.grid-cols-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem; /* Adjust gap between columns */
+}
+
+.chart-page {
+  page-break-before: always; /* Force page break before each chart */
+  page-break-after: always;  /* Ensure there's a page break after each chart */
+  display: block;
+  width: 100%;  /* Ensure charts take up the full width */
+  height: auto; /* Allow charts to adjust their height naturally */
+  margin-bottom: 20px; /* Space between charts */
+}
+
+
