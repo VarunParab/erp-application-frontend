@@ -1,6 +1,6 @@
 import React from "react";
 import Dashboard from "../components/dashboard";
-import ProfileCard from "../components/profileModal";
+import ProfileCard from "../components/Modals/profileModal";
 
 function Profile() {
   return (

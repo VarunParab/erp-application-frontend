@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import Dashboard from "../components/dashboard";
-
+import TaskModal from "../components/Modals/taskModal";
+import CheckIcon from '@mui/icons-material/Check';
 const TaskCard = ({ content, category, label, dueDate, onTaskDeleted, task }) => {
   const [isChecked, setIsChecked] = useState(false);
 
@@ -23,7 +24,7 @@ const TaskCard = ({ content, category, label, dueDate, onTaskDeleted, task }) =>
         console.error("Error deleting task:", error);
       }
     }
-  };  
+  }; 
 
   if (isChecked) {
     return null; // When checked, return null to hide the TaskCard completely
@@ -45,9 +46,10 @@ const TaskCard = ({ content, category, label, dueDate, onTaskDeleted, task }) =>
       {/* Conditionally render checkbox based on category */}
       {category !== "Completed" && (
         <div
-          className="absolute top-2 right-2 w-6 h-6 bg-white border-2 border-gray-500 rounded-lg flex items-center justify-center"
+          className="absolute top-2 right-2 w-6 h-6 bg-white hover:bg-green-100 border-2 border-gray-500 rounded-full flex items-center justify-center"
           onClick={handleCheckboxChange}
         >
+          <CheckIcon />
           <input
             type="checkbox"
             checked={isChecked}
@@ -66,7 +68,9 @@ const TaskCard = ({ content, category, label, dueDate, onTaskDeleted, task }) =>
                 ? "bg-green-500"
                 : label === "ASAP"
                 ? "bg-red-500"
-                : "bg-blue-500"
+                :label === "Feedback"
+                ? "bg-blue-500"
+                : "bg-gray-500"
             }`}
           >
             {label}
@@ -81,7 +85,19 @@ const TaskCard = ({ content, category, label, dueDate, onTaskDeleted, task }) =>
 };
 
 function Taskdemo() {
-  const [tasks, setTasks] = useState([]); // Initialize as an empty array
+  const [tasks, setTasks] = useState({}); // Initialize as an empty object
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
+  const handleTaskAdded = (newTask) => {
+    setTasks((prevTasks) => {
+      const updatedTasks = { ...prevTasks }; // Copy the previous state
+      if (!updatedTasks[newTask.category]) {
+        updatedTasks[newTask.category] = []; // If category doesn't exist, create it
+      }
+      updatedTasks[newTask.category].push(newTask); // Add the new task to the appropriate category
+      return updatedTasks;
+    });
+  };
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -131,9 +147,14 @@ function Taskdemo() {
       <div className="min-h-screen p-7 w-full bg-white rounded-2xl mt-3 ml-3 mr-3">
         <div className="flex items-center justify-between w-full">
           <h1 className="text-3xl font-extrabold ml-2">Tasks</h1>
-          <button className="bg-green-600 hover:bg-green-700 text-white text-sm mt-1 font-medium py-2 px-4 rounded-full">
+          <button onClick={()=>setIsModalOpen(true)} className="bg-green-600 hover:bg-green-700 text-white text-sm mt-1 font-medium py-2 px-4 rounded-full">
             + Add new
           </button>
+          <TaskModal
+            isOpen={isModalOpen}
+            onClose={() => setIsModalOpen(false)}
+            onTaskAdded={handleTaskAdded}
+          />
         </div>
 
         <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-400" />
@@ -161,7 +182,7 @@ function Taskdemo() {
                   content={task.content}
                   category={category}
                   label={task.label}
-                  dueDate={task.duedate} // Ensure consistent casing of keys
+                  dueDate={task.dueDate} // Ensure consistent casing of keys
                   key={task._id} // Use a unique key
                   onTaskDeleted={handleTaskDeleted}
                 />

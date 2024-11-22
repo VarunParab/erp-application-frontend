@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import Dashboard from "../components/Dashboard";
+import Dashboard from "../components/dashboard";
 import FolderIcon from "@mui/icons-material/Folder";
-import Modal from "../components/Modal";
+import Modal from "../components/Modals/projectModal";
 
 const Projects = () => {
   const [categories, setCategories] = useState(["All Projects"]);

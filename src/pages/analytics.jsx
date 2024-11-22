@@ -1,11 +1,11 @@
 import React from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
-import Dashboard from "../components/Dashboard";
-import PieChart from "../components/piechart";
-import BarChartComponent from "../components/barchart";
-import LineChart from "../components/linechart";
-import PerformanceChart from "../components/performancechart";
+import Dashboard from "../components/dashboard";
+import PieChart from "../components/Charts/piechart";
+import BarChartComponent from "../components/Charts/barchart";
+import LineChart from "../components/Charts/linechart";
+import PerformanceChart from "../components/Charts/performancechart";
 
 function Analytics() {
   const downloadPDF = () => {
