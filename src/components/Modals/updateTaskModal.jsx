@@ -1,7 +1,7 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios from "axios";
 
-const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
+const UpdateTaskModal = ({ isOpen, onClose, taskId, onTaskUpdated }) => {
   const [taskName, setTaskName] = useState("");
   const [status, setStatus] = useState("");
   const [project, setProject] = useState("");
@@ -9,34 +9,43 @@ const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
   const [assignee, setAssignee] = useState("");
   const [isCustomStatus, setIsCustomStatus] = useState(false); // State to toggle between select and input for label
 
+  useEffect(() => {
+    const fetchTask = async () => {
+        if (taskId) {
+          try {
+            const response = await axios.get(`http://localhost:4000/tasks/${taskId}`);
+            console.log("Fetched task:", response.data);  // Log the response data
+            const task = response.data;
+            setTaskName(task.taskName);
+            setStatus(task.status);
+            setProject(task.project);
+            setDueDate(task.dueDate);
+            setAssignee(task.assignee);
+          } catch (error) {
+            console.error("Error fetching task:", error);
+          }
+        }
+      };
+      
+
+    fetchTask();
+  }, [taskId]); // Fetch task when taskId changes
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Submit");
-    const task = { taskName, status, project, dueDate, assignee};
+    const updatedTask = { taskName, status, project, dueDate, assignee };
 
     try {
-      const response = await axios.post("http://localhost:4000/tasks", task);
-
-      console.log("Task added successfully:", response.data);
+      const response = await axios.patch(`http://localhost:4000/tasks/${taskId}`, updatedTask);
+      console.log("Task updated successfully:", response.data);
 
       // Notify parent to update task list
-      onTaskAdded(response.data);
+      onTaskUpdated(response.data);
 
-      // Reset fields
-      setTaskName("");
-      setStatus("");
-      setProject("");
-      setDueDate("");
-      setAssignee("");
-
-      // Close modal after task is added
-      console.log("Attempting to close modal");
+      // Close modal after task is updated
       onClose();
     } catch (error) {
-      console.error(
-        "Error adding task:",
-        error.response ? error.response.data : error.message
-      );
+      console.error("Error updating task:", error);
     }
   };
 
@@ -45,14 +54,14 @@ const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white rounded-lg shadow-lg w-11/12 max-w-lg p-6">
-        <h2 className="text-2xl font-semibold mb-4">Add New Task</h2>
+        <h2 className="text-2xl font-semibold mb-4">Update Task</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <label className="block text-gray-700 font-medium">Task Name</label>
             <input
               value={taskName}
               onChange={(e) => setTaskName(e.target.value)}
-              placeholder="Enter task name here"
+              placeholder="Update task name here"
               className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200"
               required
             />
@@ -100,7 +109,7 @@ const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
             <input
               value={project}
               onChange={(e) => setProject(e.target.value)}
-              placeholder="Enter project name here"
+              placeholder="Update project name here"
               className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200"
               required
             />
@@ -140,7 +149,7 @@ const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
               type="submit"
               className="bg-blue-500 hover:bg-blue-600 text-white font-medium py-2 px-4 rounded-md"
             >
-              Add Task
+              Update Task
             </button>
           </div>
         </form>
@@ -149,4 +158,4 @@ const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
   );
 };
 
-export default TaskModal;
+export default UpdateTaskModal;
