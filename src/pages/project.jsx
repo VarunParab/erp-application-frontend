@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Dashboard from "../components/dashboard";
+import Dashboard from "../components/Dashboard";
 import FolderIcon from "@mui/icons-material/Folder";
 import Modal from "../components/Modals/projectModal";
 

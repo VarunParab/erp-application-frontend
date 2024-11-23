@@ -2,16 +2,17 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
-  const [category, setCategory] = useState("");
-  const [content, setContent] = useState("");
-  const [label, setLabel] = useState("");
+  const [taskName, setTaskName] = useState("");
+  const [status, setStatus] = useState("");
+  const [project, setProject] = useState("");
   const [dueDate, setDueDate] = useState("");
-  const [isCustomLabel, setIsCustomLabel] = useState(false); // State to toggle between select and input for label
+  const [assignee, setAssignee] = useState("");
+  const [isCustomStatus, setIsCustomStatus] = useState(false); // State to toggle between select and input for label
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     console.log("Submit");
-    const task = { category, content, label, dueDate };
+    const task = { taskName, status, project, dueDate, assignee};
 
     try {
       const response = await axios.post("http://localhost:4000/tasks", task);
@@ -22,10 +23,11 @@ const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
       onTaskAdded(response.data);
 
       // Reset fields
-      setCategory("");
-      setContent("");
-      setLabel("");
+      setTaskName("");
+      setStatus("");
+      setProject("");
       setDueDate("");
+      setAssignee("");
 
       // Close modal after task is added
       console.log("Attempting to close modal");
@@ -46,51 +48,37 @@ const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
         <h2 className="text-2xl font-semibold mb-4">Add New Task</h2>
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-gray-700 font-medium">Category</label>
-            <select
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
-              className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200"
-              required
-            >
-              <option value="">Select a category</option>
-              <option value="New">New Task</option>
-              <option value="InProgress">InProgress</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium">Content</label>
-            <textarea
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder="Enter task content"
+            <label className="block text-gray-700 font-medium">Task Name</label>
+            <input
+              value={taskName}
+              onChange={(e) => setTaskName(e.target.value)}
+              placeholder="Enter task name here"
               className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200"
               required
             />
           </div>
 
           <div>
-            <label className="block text-gray-700 font-medium">Label</label>
-            {/* Conditionally render input or select based on isCustomLabel */}
-            {!isCustomLabel ? (
+            <label className="block text-gray-700 font-medium">Status</label>
+            {/* Conditionally render input or select based on isCustomStatus */}
+            {!isCustomStatus ? (
               <select
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
                 className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200"
                 required
               >
-                <option value="">Select a category</option>
-                <option value="ASAP">ASAP</option>
-                <option value="Low Priority">Low Priority</option>
-                <option value="Feedback">Feedback</option>
+                <option value="">Select a status</option>
+                <option value="New">New</option>
+                <option value="In Progress">In Progress</option>
+                <option value="Overdue">Overdue</option>
               </select>
             ) : (
               <input
                 type="text"
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                placeholder="Enter custom label"
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                placeholder="Enter custom status"
                 className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200"
               />
             )}
@@ -100,11 +88,22 @@ const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
           <div>
             <button
               type="button"
-              onClick={() => setIsCustomLabel((prev) => !prev)}
+              onClick={() => setIsCustomStatus((prev) => !prev)}
               className="text-blue-500 mt-2"
             >
-              {isCustomLabel ? "Select from list" : "Enter custom label"}
+              {isCustomStatus ? "Select from list" : "Enter custom status"}
             </button>
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium">Project</label>
+            <input
+              value={project}
+              onChange={(e) => setProject(e.target.value)}
+              placeholder="Enter project name here"
+              className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200"
+              required
+            />
           </div>
 
           <div>
@@ -113,6 +112,17 @@ const TaskModal = ({ isOpen, onClose, onTaskAdded }) => {
               type="date"
               value={dueDate}
               onChange={(e) => setDueDate(e.target.value)}
+              className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200"
+              required
+            />
+          </div>
+
+          <div>
+            <label className="block text-gray-700 font-medium">Assignee</label>
+            <input
+              value={assignee}
+              onChange={(e) => setAssignee(e.target.value)}
+              placeholder="Enter assignee here"
               className="w-full border rounded-md px-3 py-2 mt-1 focus:outline-none focus:ring focus:ring-blue-200"
               required
             />
