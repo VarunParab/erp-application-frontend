@@ -1,200 +1,225 @@
-import React, { useState } from "react";
-import Dashboard from "../components/dashboard";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+import Dashboard from "../components/Dashboard";
+import TaskModal from "../components/Modals/taskModal";
+import UpdateTaskModal from "../components/Modals/updateTaskModal";
 
-// Reusable TaskCard Component
-const TaskCard = ({ content, category, label, dueDate }) => {
-  const [isChecked, setIsChecked] = useState(false);
+function TaskDemo() {
+  const [tasks, setTasks] = useState([]); // State to store tasks
+  const [taskId, setTaskId] = useState(null); // Task ID for updating
+  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
 
-  const bgColor = {
-    Completed: "bg-green-200 border-solid border-2 border-green-300",
-    Overdue: "bg-gray-300 border-solid border-2 border-gray-300",
-    InProgress: "bg-yellow-100 border-solid border-2 border-yellow-300",
-    New: "bg-blue-100 border-solid border-2 border-blue-300",
+  // Fetch tasks on component mount
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get("http://localhost:4000/tasks"); // Replace with your API URL
+        setTasks(response.data); // Assume the response data is an array of tasks
+      } catch (error) {
+        console.error("Error fetching tasks:", error);
+      }
+    };
+
+    fetchTasks();
+  }, []); // Empty dependency array ensures it runs only once on mount
+
+  // Handle task addition by updating the state
+  const handleAddTask = (newTask) => {
+    setTasks((prevTasks) => [...prevTasks, newTask]); // Add the new task to the tasks state
   };
 
-  const handleCheckboxChange = () => {
-    setIsChecked(!isChecked);
+  // Handle task update
+  const handleUpdateTask = async (updatedTask) => {
+    try {
+      // Ensure updatedTask contains a valid _id and all necessary fields for the update
+      if (!updatedTask._id) {
+        console.error("No task ID found for updating");
+        return;
+      }
+
+      console.log("Updating task with ID:", updatedTask._id);
+
+      const response = await axios.patch(
+        `http://localhost:4000/tasks/${updatedTask._id}`,
+        updatedTask
+      );
+
+      console.log("Update response:", response.data);
+
+      setTasks((prevTasks) => {
+        return prevTasks.map((task) =>
+          task._id === updatedTask._id ? updatedTask : task
+        );
+      });
+
+      setIsModalOpen(false); // Close the modal after a successful update
+    } catch (error) {
+      console.error("Error updating task:", error);
+      alert("Failed to update the task. Please try again."); // Optional alert for user feedback
+    }
   };
-
-  if (isChecked) {
-    return null; // When checked, return null to hide the TaskCard completely
-  }
-
-  return (
-    <div
-      className={`text-black p-4 rounded-2xl shadow-md w-[240px] h-[140px] ${bgColor[category]} flex flex-col relative ml-6`}
-    >
-      {/* Title with truncation */}
-      <div
-        className={`font-semibold text-sm overflow-hidden text-ellipsis line-clamp-2 ${
-          category === "Completed" ? "w-full" : "pr-8"
-        }`}
-      >
-        {content}
-      </div>
-
-      {/* Conditionally render checkbox based on category */}
-      {category !== "Completed" && (
-        <div
-          className="absolute top-2 right-2 w-6 h-6 bg-white border-2 border-gray-500 rounded-lg flex items-center justify-center"
-          onClick={handleCheckboxChange}
-        >
-          <input
-            type="checkbox"
-            checked={isChecked}
-            onChange={handleCheckboxChange}
-            className="appearance-none w-4 h-4 rounded-sm checked:bg-green-500 checked:border-transparent"
-          />
-        </div>
-      )}
-
-      {/* Label and Due Date */}
-      <div className="mt-4 mr-2 flex items-center justify-start">
-        {label ? (
-          <div
-            className={`text-white text-xs px-2 py-1 rounded-lg ${
-              label === "Completed" || label === "completed"
-                ? "bg-green-500"
-                : label === "ASAP" || label === "asap"
-                ? "bg-red-500"
-                : "bg-blue-500"
-            }`}
-          >
-            {label}
-          </div>
-        ) : (
-          <div className="h-6" /> // Placeholder for spacing when label is empty
-        )}
-      </div>
-      <div className="mt-2 text-xs text-gray-500">{dueDate}</div>
-    </div>
-  );
-};
-
-const Task = () => {
-  // Define task data for each category
-  const tasks = {
-    New: [
-      {
-        content: "Review and comment website design",
-        label: "ASAP",
-        dueDate: "6 days left",
-      },
-      {
-        content: "Prepare design files for web developer developer",
-        label: "",
-        dueDate: "3 days left",
-      },
-      {
-        content: "Send new website link to the team",
-        label: "Feedback",
-        dueDate: "5 days left",
-      },
-    ],
-    InProgress: [
-      {
-        content: "Design the entire web in a chosen style",
-        label: "ASAP",
-        dueDate: "1 day left",
-      },
-      {
-        content: "Write meta title and meta description",
-        label: "Low Priority",
-        dueDate: "4 days left",
-      },
-      {
-        content: "Develop website using CMS platform",
-        label: "",
-        dueDate: "2 days left",
-      },
-    ],
-    Overdue: [
-      {
-        content: "Write website copy in a detailed manner",
-        label: "Low Priority",
-        dueDate: "2 days ago",
-      },
-      {
-        content: "Design drafts in 3 different styles",
-        label: "",
-        dueDate: "5 days ago",
-      },
-    ],
-    Completed: [
-      {
-        content: "Develop a structure for a new website",
-        label: "Completed",
-        dueDate: "1 day ago",
-      },
-    ],
-  };
-
-  // Find the maximum number of tasks in any category to set the row count
-  const maxTasks = Math.max(
-    ...Object.values(tasks).map((category) => category.length)
-  );
 
   return (
     <div className="flex bg-gray-200">
-      {/* Sidebar with Dashboard */}
       <div className="w-[242.01px]">
         <Dashboard />
       </div>
-
-      {/* Main Content Area */}
       <div className="min-h-screen p-7 w-full bg-white rounded-2xl mt-3 ml-3 mr-3">
-        {/* Header */}
-        <div className="flex items-center justify-between w-full">
-          <h1 className="text-3xl font-extrabold ml-2">Tasks</h1>
-          <button className="bg-green-600 hover:bg-green-700 text-white text-sm mt-1 font-medium py-2 px-4 rounded-full">
-            + Add new
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl ml-2 font-extrabold">✅ Tasks</h1>
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="bg-blue-500 text-white px-4 py-2 rounded-2xl shadow hover:bg-blue-600"
+          >
+            + Add New
           </button>
         </div>
+        <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
+          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+            <thead className="text-xs text-black uppercase bg-gray-200">
+              <tr>
+                <th scope="col" className="p-4"></th>
+                <th scope="col" className="px-6 py-3">
+                  Task name
+                </th>
+                <th scope="col" className="px-6 py-3 text-center">
+                  Status
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Project
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Created At
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Due Date
+                </th>
+                <th scope="col" className="px-6 py-3">
+                  Assignee
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {tasks.map((task) => {
+                const createdAtDate = new Date(task.createdAt)
+                  .toLocaleDateString("en-GB")
+                  .replace(/\//g, "-");
 
-        <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-400" />
+                return (
+                  <tr
+                    key={task._id}
+                    className="bg-white border-b bg-white hover:bg-gray-50"
+                    onClick={() => {
+                      if (task.status !== "Completed") {
+                        console.log("Task clicked with ID:", task._id);
+                        setIsModalOpen(true);
+                        setTaskId(task._id);
+                      } else {
+                        console.log("Task is completed. Edit disabled.");
+                      }
+                    }}
+                  >
+                    <td className="w-4 p-4">
+                      <div className="flex items-center">
+                        <input
+                          id={`checkbox-${task._id}`}
+                          type="checkbox"
+                          className="w-4 h-4 rounded border-gray-300 checked:bg-green-500 focus:ring-green-500 focus:ring-2"
+                          checked={task.status === "Completed"}
+                          disabled={task.status === "Completed"} // Disable if already completed
+                          onClick={(e) => e.stopPropagation()} // Prevent row click event
+                          onChange={async () => {
+                            if (task.status !== "Completed") {
+                              try {
+                                // Update the status to "Completed" in the backend
+                                await axios.patch(
+                                  `http://localhost:4000/tasks/${task._id}`,
+                                  {
+                                    status: "Completed",
+                                  }
+                                );
 
-        {/* Categories Header */}
-        <div className="grid grid-cols-4 gap-2 text-center">
-          {["New Task", "In progress", "Overdue", "Completed"].map(
-            (category, index) => (
-              <div key={index} className="col-span-1 font-semibold">
-                {category}
-              </div>
-            )
-          )}
+                                // Update the status in the state
+                                setTasks((prevTasks) =>
+                                  prevTasks.map((t) =>
+                                    t._id === task._id
+                                      ? { ...t, status: "Completed" }
+                                      : t
+                                  )
+                                );
+                              } catch (error) {
+                                console.error(
+                                  "Error updating task status:",
+                                  error
+                                );
+                                alert(
+                                  "Failed to update the task status. Please try again."
+                                );
+                              }
+                            }
+                          }}
+                        />
+                        <label
+                          htmlFor={`checkbox-${task._id}`}
+                          className="sr-only"
+                        >
+                          checkbox
+                        </label>
+                      </div>
+                    </td>
+
+                    <th
+                      scope="row"
+                      className="px-6 py-4 font-medium text-black whitespace-nowrap overflow-hidden truncate max-w-[200px]"
+                    >
+                      {task.taskName}
+                    </th>
+
+                    <td className="px-6 py-4 text-center">
+                      <span
+                        className={`px-3 py-1 text-sm font-medium rounded-full ${
+                          task.status === "Completed"
+                            ? "bg-green-100 text-green-800"
+                            : task.status === "In Progress"
+                            ? "bg-yellow-100 text-yellow-800"
+                            : task.status === "Overdue"
+                            ? "bg-red-100 text-red-800"
+                            : task.status === "Completed"
+                            ? "bg-green-100 text-green-800"
+                            : "bg-blue-100 text-blue-800"
+                        }`}
+                      >
+                        {task.status}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4 text-black">{task.project}</td>
+                    <td className="px-6 py-4 text-black">{createdAtDate}</td>
+                    <td className="px-6 py-4 text-black">
+                      {new Date(task.dueDate)
+                        .toLocaleDateString("en-GB")
+                        .replace(/\//g, "-")}
+                    </td>
+                    <td className="px-6 py-4 text-black">{task.assignee}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
         </div>
-
-        <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-400" />
-
-        {/* Task Grid */}
-        <div className="grid grid-cols-4 gap-4 divide-x divide-gray-300">
-          {Object.keys(tasks).map((category, index) => (
-            <div key={index} className="grid gap-4">
-              {tasks[category].map((task, i) => (
-                <TaskCard
-                  content={task.content}
-                  category={category}
-                  label={task.label}
-                  dueDate={task.dueDate}
-                  key={i}
-                /> // Pass task content, label, and due date
-              ))}
-              {/* Only render empty placeholders if there are fewer tasks than maxTasks */}
-              {tasks[category].length < maxTasks &&
-                Array.from({ length: maxTasks - tasks[category].length }).map(
-                  (_, i) => (
-                    <div
-                      key={`empty-placeholder-${i}`}
-                      className="w-[265px] h-[150px]"
-                    ></div> // Placeholder div
-                  )
-                )}
-            </div>
-          ))}
-        </div>
+        <TaskModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onTaskAdded={handleAddTask}
+        />
+        <UpdateTaskModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          taskId={taskId}
+          onTaskUpdated={handleUpdateTask}
+        />
       </div>
     </div>
   );
-};
+}
 
-export default Task;
+export default TaskDemo;

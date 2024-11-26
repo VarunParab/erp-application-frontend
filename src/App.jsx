@@ -8,7 +8,7 @@ import Notifications from "./pages/notifications";
 import Analytics from "./pages/analytics";
 import Profile from "./pages/profile";
 import Report from "./pages/report";
-import Taskdemo from "./pages/demo";
+//import Taskdemo from "./pages/demo";
 function App() {
   return (
     <Router>
@@ -21,7 +21,7 @@ function App() {
         <Route path="/analytics" element={<Analytics />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/reports" element={<Report />} />
-        <Route path="/taskdemo" element={<Taskdemo />} />
+        {/* <Route path="/taskdemo" element={<Taskdemo />} /> */}
       </Routes>
     </Router>
   );
