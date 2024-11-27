@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Dashboard from "../components/dashboard";
+import Dashboard from "../components/Dashboard";
 import AttachFileRoundedIcon from "@mui/icons-material/AttachFileRounded";
 import SendRoundedIcon from "@mui/icons-material/SendRounded";
 import CircleIcon from "@mui/icons-material/Circle";
@@ -164,12 +164,12 @@ function Chats() {
             <div className="space-y-4">
               {contacts.map((contact, index) => (
                 <div
-                key={index}
-                className={`relative flex items-center justify-between p-2 rounded-xl cursor-pointer ${
-                  selectedContact === index ? "bg-gray-200" : "bg-white"
-                }`}
-                onClick={() => handleContactClick(index)} // Select contact on click
-              >
+                  key={index}
+                  className={`relative flex items-center justify-between p-2 rounded-xl cursor-pointer ${
+                    selectedContact === index ? "bg-gray-200" : "bg-white"
+                  }`}
+                  onClick={() => handleContactClick(index)} // Select contact on click
+                >
                   {/* Profile Icon */}
                   <div className="w-10 h-10 rounded-full bg-gray-200 mr-4">
                     <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-gray-300">
@@ -234,7 +234,7 @@ function Chats() {
                     </h3>
                     <p className="text-xs">
                       <CircleIcon
-                      style={{ fontSize: '15px' }} 
+                        style={{ fontSize: "15px" }}
                         className={`px-0.5 py-0.5 mb-0.5 ${
                           {
                             Online: "text-green-500",
@@ -275,21 +275,22 @@ function Chats() {
 
                             {/* Message Bubble */}
                             <div className="flex flex-col items-end">
-  {/* Message Bubble */}
-  <div
-    className={`${
-      isMyMessage ? "bg-blue-500 text-white" : "bg-white"
-    } p-3 rounded-2xl max-w-xs`}
-  >
-    <p>{message.text}</p>
-  </div>
+                              {/* Message Bubble */}
+                              <div
+                                className={`${
+                                  isMyMessage
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-white"
+                                } p-3 rounded-2xl max-w-xs`}
+                              >
+                                <p>{message.text}</p>
+                              </div>
 
-  {/* Timestamp */}
-  <div className="text-xs text-gray-400 mt-1 mr-2 text-right">
-    {message.timestamp}
-  </div>
-</div>
-
+                              {/* Timestamp */}
+                              <div className="text-xs text-gray-400 mt-1 mr-2 text-right">
+                                {message.timestamp}
+                              </div>
+                            </div>
 
                             {/* My Profile Icon */}
                             {isMyMessage && (

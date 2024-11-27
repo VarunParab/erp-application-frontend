@@ -2,7 +2,7 @@ import { Icon } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import Dashboard from "../components/dashboard";
+import Dashboard from "../components/Dashboard";
 import DateProfile from "../components/dateprofile";
 
 const Homepage = () => {

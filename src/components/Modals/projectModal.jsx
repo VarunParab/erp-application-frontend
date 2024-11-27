@@ -10,10 +10,9 @@ const Modal = ({
   handleInputChange,
   handleAddCategory,
   handleAddProject,
-  projectDetails,
 }) => {
-  if (!modalOpen) return null; // 
-  
+  if (!modalOpen) return null;
+
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
       <div className="bg-white p-6 rounded-lg w-1/3">
@@ -44,44 +43,39 @@ const Modal = ({
           </>
         ) : (
           <>
-            <h2 className="text-2xl font-bold mb-4">
-              {projectDetails ? 'Project Details' : 'Add New Project'}
-            </h2>
+            <h2 className="text-2xl font-bold mb-4">Add New Project</h2>
             <form>
               <div className="mb-4">
                 <label className="block mb-1">Project Name</label>
                 <input
                   type="text"
                   name="name"
-                  value={projectDetails ? projectDetails.name : newProject.name}
+                  value={newProject.name}
                   onChange={handleInputChange}
                   className="w-full border p-2 rounded"
-                  disabled={!!projectDetails} // Disable if viewing details
                 />
               </div>
               <div className="mb-4">
                 <label className="block mb-1">Details</label>
                 <textarea
                   name="details"
-                  value={projectDetails ? projectDetails.details : newProject.details}
+                  value={newProject.details}
                   onChange={handleInputChange}
                   className="w-full border p-2 rounded"
-                  disabled={!!projectDetails} // Disable if viewing details
                 />
               </div>
               <div className="mb-4">
                 <label className="block mb-1">Status</label>
                 <select
                   name="status"
-                  value={projectDetails ? projectDetails.status : newProject.status}
+                  value={newProject.status}
                   onChange={handleInputChange}
                   className="w-full border p-2 rounded"
-                  disabled={!!projectDetails} // Disable if viewing details
                 >
                   <option value="">Select Status</option>
-                  <option value="🚀 In Progress">🚀 In Progress</option>
-                  <option value="⏳ On Hold">⏳ On Hold</option>
-                  <option value="✉️ New Project">✉️ New Project</option>
+                  <option value="In Progress">🚀 In Progress</option>
+                  <option value="On Hold">⏳ On Hold</option>
+                  <option value="New Project">✉️ New Project</option>
                 </select>
               </div>
               <div className="mb-4">
@@ -89,13 +83,12 @@ const Modal = ({
                 <input
                   type="text"
                   name="progress"
-                  value={projectDetails ? projectDetails.progress : newProject.progress}
+                  value={newProject.progress}
                   onChange={handleInputChange}
                   className="w-full border p-2 rounded"
-                  disabled={!!projectDetails} // Disable if viewing details
                 />
               </div>
-              
+
               {/* Client Input */}
               <div className="mb-4">
                 <label htmlFor="client" className="block text-sm font-medium text-gray-700">
@@ -105,11 +98,10 @@ const Modal = ({
                   type="text"
                   id="client"
                   name="client"
-                  value={projectDetails ? projectDetails.client : newProject.client}
+                  value={newProject.client}
                   onChange={handleInputChange}
                   className="w-full p-2 mt-1 border rounded-md"
                   placeholder="Enter Client Name"
-                  disabled={!!projectDetails} // Disable if viewing details
                 />
               </div>
 
@@ -123,10 +115,9 @@ const Modal = ({
                     type="date"
                     id="startDate"
                     name="startDate"
-                    value={projectDetails ? projectDetails.startDate : newProject.startDate}
+                    value={newProject.startDate}
                     onChange={handleInputChange}
                     className="w-full p-2 mt-1 border rounded-md"
-                    disabled={!!projectDetails} // Disable if viewing details
                   />
                 </div>
 
@@ -138,30 +129,27 @@ const Modal = ({
                     type="date"
                     id="endDate"
                     name="endDate"
-                    value={projectDetails ? projectDetails.endDate : newProject.endDate}
+                    value={newProject.endDate}
                     onChange={handleInputChange}
                     className="w-full p-2 mt-1 border rounded-md"
-                    disabled={!!projectDetails} // Disable if viewing details
                   />
                 </div>
               </div>
 
               <div className="flex justify-end">
-                {!projectDetails && (
-                  <button
-                    type="button"
-                    className="bg-blue-600 text-white px-4 py-2 rounded mr-2"
-                    onClick={handleAddProject}
-                  >
-                    Add Project
-                  </button>
-                )}
+                <button
+                  type="button"
+                  className="bg-blue-600 text-white px-4 py-2 rounded mr-2"
+                  onClick={handleAddProject}
+                >
+                  Add Project
+                </button>
                 <button
                   type="button"
                   className="bg-gray-400 text-white px-4 py-2 rounded"
                   onClick={() => setModalOpen(false)}
                 >
-                  {projectDetails ? 'Close' : 'Cancel'}
+                  Cancel
                 </button>
               </div>
             </form>
