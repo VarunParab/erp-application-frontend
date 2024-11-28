@@ -7,6 +7,7 @@ import UpdateTaskModal from "../components/Modals/updateTaskModal";
 function TaskDemo() {
   const [tasks, setTasks] = useState([]); // State to store tasks
   const [taskId, setTaskId] = useState(null); // Task ID for updating
+  const [modalType, setModalType] = useState("");
   const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
 
   // Fetch tasks on component mount
@@ -68,7 +69,10 @@ function TaskDemo() {
         <div className="flex justify-between items-center">
           <h1 className="text-3xl ml-2 font-extrabold">✅ Tasks</h1>
           <button
-            onClick={() => setIsModalOpen(true)}
+            onClick={() => {
+              setIsModalOpen(true);
+              setModalType('add')
+            }}
             className="bg-blue-500 text-white px-4 py-2 rounded-2xl shadow hover:bg-blue-600"
           >
             + Add New
@@ -113,6 +117,7 @@ function TaskDemo() {
                       if (task.status !== "Completed") {
                         console.log("Task clicked with ID:", task._id);
                         setIsModalOpen(true);
+                        setModalType("update");
                         setTaskId(task._id);
                       } else {
                         console.log("Task is completed. Edit disabled.");
@@ -206,17 +211,23 @@ function TaskDemo() {
             </tbody>
           </table>
         </div>
-        <TaskModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          onTaskAdded={handleAddTask}
-        />
-        <UpdateTaskModal
-          isOpen={isModalOpen}
-          onClose={() => setIsModalOpen(false)}
-          taskId={taskId}
-          onTaskUpdated={handleUpdateTask}
-        />
+        {modalType === "add" && (
+  <TaskModal
+    isOpen={isModalOpen}
+    onClose={() => setIsModalOpen(false)}
+    onTaskAdded={handleAddTask}
+  />
+)}
+
+{modalType === "update" && (
+  <UpdateTaskModal
+    isOpen={isModalOpen}
+    onClose={() => setIsModalOpen(false)}
+    taskId={taskId}
+    onTaskUpdated={handleUpdateTask}
+  />
+)}
+
       </div>
     </div>
   );
