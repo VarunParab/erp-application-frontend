@@ -12,6 +12,7 @@ const CategoryAndProjectList = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalType, setModalType] = useState("");
   const [newCategory, setNewCategory] = useState("");
+  const [projectDetails, setProjectDetails] = useState("");
   const [newProject, setNewProject] = useState({
     name: "",
     details: "",
@@ -206,10 +207,11 @@ const CategoryAndProjectList = () => {
   };
   
 
-  // const handleProjectClick = (project) => {
-  //   setModalType("project");
-  //   setModalOpen(true);
-  // };
+  const handleProjectClick = (project) => {
+    setModalType("project");
+    setProjectDetails(project);
+    setModalOpen(true);
+  };
 
   // Render UI
   return (
@@ -283,6 +285,7 @@ const CategoryAndProjectList = () => {
                 onClick={() => {
                   setModalOpen(true);
                   setModalType("project");
+                  setProjectDetails(null);
                 }}
               >
                 + Add new
@@ -305,6 +308,7 @@ const CategoryAndProjectList = () => {
                     <tr
                       key={index}
                       className="cursor-pointer"
+                      onClick={() => handleProjectClick(project)}
                     >
                       <td className="px-4 py-2 text-sm text-start w-2/6">
                         {project.projectName}
@@ -356,6 +360,7 @@ const CategoryAndProjectList = () => {
         handleInputChange={handleInputChange}
         handleAddCategory={handleAddCategory}
         handleAddProject={handleAddProject}
+        projectDetails={projectDetails} // Pass project details to modal
       />
     </div>
   );
