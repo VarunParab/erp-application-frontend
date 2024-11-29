@@ -34,7 +34,9 @@ function AddProjectModal({ isOpen, onClose, selectedCategory, setProjects }) {
         const apiUrl =
           selectedCategory === "All Projects"
             ? "http://localhost:4000/category/allProjects"
-            : `http://localhost:4000/category/${encodeURIComponent(selectedCategory)}`;
+            : `http://localhost:4000/category/${encodeURIComponent(
+                selectedCategory
+              )}`;
 
         const requestBody =
           selectedCategory === "All Projects"
@@ -63,7 +65,8 @@ function AddProjectModal({ isOpen, onClose, selectedCategory, setProjects }) {
 
         if (response.data.success) {
           const addedProject =
-            response.data.project || response.data.category.projects.slice(-1)[0];
+            response.data.project ||
+            response.data.category.projects.slice(-1)[0];
 
           setProjects((prevProjects) => [...prevProjects, addedProject]);
 
@@ -96,59 +99,118 @@ function AddProjectModal({ isOpen, onClose, selectedCategory, setProjects }) {
     <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
       <div className="bg-white p-6 rounded-lg w-1/3">
         <h2 className="text-2xl font-bold mb-4">Add Project</h2>
-        <input
-          type="text"
-          name="name"
-          value={newProject.name}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Project Name"
-        />
-        <textarea
-          name="details"
-          value={newProject.details}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Details"
-        />
-        <input
-          type="text"
-          name="status"
-          value={newProject.status}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Status"
-        />
-        <input
-          type="text"
-          name="progress"
-          value={newProject.progress}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Progress"
-        />
-        <input
-          type="date"
-          name="startDate"
-          value={newProject.startDate}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-        />
-        <input
-          type="date"
-          name="endDate"
-          value={newProject.endDate}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-        />
-        <input
-          type="text"
-          name="client"
-          value={newProject.client}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Client"
-        />
+        {/* Project Name */}
+        <div className="mb-4">
+          <label className="block mb-1">Project Name</label>
+          <input
+            type="text"
+            name="name"
+            value={newProject.name}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            placeholder="Project Name"
+          />
+        </div>
+
+        {/* Details */}
+        <div className="mb-4">
+          <label className="block mb-1">Details</label>
+          <textarea
+            name="details"
+            value={newProject.details}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            placeholder="Details"
+          />
+        </div>
+
+        {/* Status */}
+        <div className="mb-4">
+          <label className="block mb-1">Status</label>
+          <select
+            name="status"
+            value={newProject.status}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+          >
+            <option value="">Select Status</option>
+            <option value="In Progress">🚀 In Progress</option>
+            <option value="On Hold">⏳ On Hold</option>
+            <option value="New Project">✉️ New Project</option>
+          </select>
+        </div>
+
+        {/* Progress */}
+        <div className="mb-4">
+          <label className="block mb-1">Progress</label>
+          <input
+            type="number"
+            name="progress"
+            value={newProject.progress}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            placeholder="Progress"
+            min="0"
+            max="100"
+          />
+        </div>
+
+        {/* Client */}
+        <div className="mb-4">
+          <label
+            htmlFor="client"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Client Name
+          </label>
+          <input
+            type="text"
+            id="client"
+            name="client"
+            value={newProject.client}
+            onChange={handleChange}
+            className="w-full p-2 mt-1 border rounded-md"
+            placeholder="Enter Client Name"
+          />
+        </div>
+
+        {/* Start Date and End Date */}
+        <div className="flex gap-4 mb-4">
+          <div className="w-1/2">
+            <label
+              htmlFor="startDate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Start Date
+            </label>
+            <input
+              type="date"
+              id="startDate"
+              name="startDate"
+              value={newProject.startDate}
+              onChange={handleChange}
+              className="w-full p-2 mt-1 border rounded-md"
+            />
+          </div>
+
+          <div className="w-1/2">
+            <label
+              htmlFor="endDate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              End Date
+            </label>
+            <input
+              type="date"
+              id="endDate"
+              name="endDate"
+              value={newProject.endDate}
+              onChange={handleChange}
+              className="w-full p-2 mt-1 border rounded-md"
+            />
+          </div>
+        </div>
+
         <div className="flex justify-end">
           <button
             className="bg-gray-400 text-white px-4 py-2 rounded mr-2"

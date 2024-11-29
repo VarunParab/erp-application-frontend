@@ -42,23 +42,16 @@ function UpdateProjectModal({
   };
 
   const handleUpdateProject = async () => {
-    // Log the selected project at the start of the function
     console.log("Selected Project at handleUpdateProject: ", selectedProject);
   
-    // Ensure selectedProject is defined and has _id before proceeding
-    if (!selectedProject) {
-      console.error("Error: selectedProject is undefined.");
-      alert("Please select a project.");
+    // Check if selectedProject is defined
+    if (!selectedProject || !selectedProject._id) {
+      console.error("Error: selectedProject or selectedProject._id is missing.");
+      alert("Please select a valid project.");
       return;
     }
   
-    if (!selectedProject._id) {
-      console.error("Error: selectedProject._id is missing.");
-      alert("Project ID is missing.");
-      return;
-    }
-  
-    // Ensure that all fields in updatedProject are filled
+    // Check if all required fields are filled
     if (
       !updatedProject.name ||
       !updatedProject.details ||
@@ -72,62 +65,54 @@ function UpdateProjectModal({
       return;
     }
   
-    // Prepare the request body based on category
-    const requestBody =
-      selectedCategory === "All Projects"
-        ? {
-            projectName: updatedProject.name,
-            details: updatedProject.details,
-            status: updatedProject.status,
-            progress: updatedProject.progress,
-            startDate: updatedProject.startDate,
-            endDate: updatedProject.endDate,
-            client: updatedProject.client,
-          }
-        : {
-            categoryName: selectedCategory,
-            projectName: updatedProject.name,
-            details: updatedProject.details,
-            status: updatedProject.status,
-            progress: updatedProject.progress,
-            startDate: updatedProject.startDate,
-            endDate: updatedProject.endDate,
-            client: updatedProject.client,
-          };
+    // Include the categoryName if the project has a category
+    const requestBody = {
+      projectName: updatedProject.name,
+      details: updatedProject.details,
+      status: updatedProject.status,
+      progress: updatedProject.progress,
+      startDate: updatedProject.startDate,
+      endDate: updatedProject.endDate,
+      client: updatedProject.client,
+      categoryName: selectedCategory === "All Projects"
+        ? selectedProject.categoryName
+        : selectedCategory || null,
+    };
   
     try {
-      // Log the request body for debugging purposes
+      console.log("Category Name: ", selectedProject.categoryName);
       console.log("Request Body: ", requestBody);
   
       const apiUrl = `http://localhost:4000/category/projects/${selectedProject._id}`;
       console.log("Making PUT request to:", apiUrl);
   
-      // Make the PUT request to update the project
       const response = await axios.put(apiUrl, requestBody);
   
+      // Check if the response is successful and contains the updated project data
       if (response.data.success) {
-        const updated = response.data.project;
+        const updated = response.data.project;  // Assuming the response contains updated project data
         console.log("Updated Project: ", updated);
   
-        // Update the projects state with the updated project
+        // Update the projects list using the response data
         setProjects((prevProjects) =>
           prevProjects.map((project) =>
             project._id === updated._id ? updated : project
           )
         );
   
-        // Close modal and reset form
-        onClose();
+        onClose(); // Close the modal after update 
       } else {
-        console.error("API Error:", response.data.message || "Failed to update project.");
-        alert(response.data.message || "Failed to update project.");
+        // Log a meaningful message if success flag is true but project data is not updated
+        console.error("API Error: ", response.data.message || "Project update failed.");
+        alert(response.data.message || "Project update failed.");
       }
     } catch (error) {
-      // Log detailed error for debugging
       console.error("Error updating project:", error.response ? error.response.data : error.message);
       alert("There was an error updating the project.");
     }
-  };  
+  };
+  
+  
 
   if (!isOpen) return null;
 
@@ -135,66 +120,122 @@ function UpdateProjectModal({
     <div className="fixed inset-0 flex items-center justify-center bg-gray-600 bg-opacity-50">
       <div className="bg-white p-6 rounded-lg w-1/3">
         <h2 className="text-2xl font-bold mb-4">Update Project</h2>
-        <input
-          type="text"
-          name="name"
-          value={updatedProject.name}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Project Name"
-        />
-        <textarea
-          name="details"
-          value={updatedProject.details}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Details"
-        />
-        <input
-          type="text"
-          name="status"
-          value={updatedProject.status}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Status"
-        />
-        <input
-          type="text"
-          name="progress"
-          value={updatedProject.progress}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Progress"
-        />
-        <input
-          type="date"
-          name="startDate"
-          value={
+        <div className="mb-4">
+          <label className="block mb-1">Project Name</label>
+          <input
+            type="text"
+            name="name"
+            value={updatedProject.name}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            placeholder="Project Name"
+          />
+        </div>
+
+        {/* Details */}
+        <div className="mb-4">
+          <label className="block mb-1">Details</label>
+          <textarea
+            name="details"
+            value={updatedProject.details}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            placeholder="Details"
+          />
+        </div>
+
+        {/* Status */}
+        <div className="mb-4">
+          <label className="block mb-1">Status</label>
+          <select
+            name="status"
+            value={updatedProject.status}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+          >
+            <option value="">Select Status</option>
+            <option value="In Progress">🚀 In Progress</option>
+            <option value="On Hold">⏳ On Hold</option>
+            <option value="New Project">✉️ New Project</option>
+          </select>
+        </div>
+
+        {/* Progress */}
+        <div className="mb-4">
+          <label className="block mb-1">Progress</label>
+          <input
+            type="number"
+            name="progress"
+            value={updatedProject.progress}
+            onChange={handleChange}
+            className="w-full border p-2 rounded"
+            placeholder="Progress"
+            min="0"
+            max="100"
+          />
+        </div>
+
+        {/* Client */}
+        <div className="mb-4">
+          <label
+            htmlFor="client"
+            className="block text-sm font-medium text-gray-700"
+          >
+            Client Name
+          </label>
+          <input
+            type="text"
+            id="client"
+            name="client"
+            value={updatedProject.client}
+            onChange={handleChange}
+            className="w-full p-2 mt-1 border rounded-md"
+            placeholder="Enter Client Name"
+          />
+        </div>
+
+        {/* Start Date and End Date */}
+        <div className="flex gap-4 mb-4">
+          <div className="w-1/2">
+            <label
+              htmlFor="startDate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              Start Date
+            </label>
+            <input
+              type="date"
+              id="startDate"
+              name="startDate"
+              value={
             updatedProject.startDate
               ? updatedProject.startDate.split("T")[0]
               : ""
           }
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-        />
-        <input
-          type="date"
-          name="endDate"
-          value={
+              onChange={handleChange}
+              className="w-full p-2 mt-1 border rounded-md"
+            />
+          </div>
+
+          <div className="w-1/2">
+            <label
+              htmlFor="endDate"
+              className="block text-sm font-medium text-gray-700"
+            >
+              End Date
+            </label>
+            <input
+              type="date"
+              id="endDate"
+              name="endDate"
+              value={
             updatedProject.endDate ? updatedProject.endDate.split("T")[0] : ""
           }
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-        />
-
-        <input
-          type="text"
-          name="client"
-          value={updatedProject.client}
-          onChange={handleChange}
-          className="w-full border p-2 rounded mb-4"
-          placeholder="Client"
-        />
+              onChange={handleChange}
+              className="w-full p-2 mt-1 border rounded-md"
+            />
+          </div>
+        </div>
         <div className="flex justify-end">
           <button
             className="bg-gray-400 text-white px-4 py-2 rounded mr-2"

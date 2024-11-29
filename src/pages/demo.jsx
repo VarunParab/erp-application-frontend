@@ -171,7 +171,7 @@ function Demo() {
                   <th className="px-4 py-2 text-sm">Progress</th>
                   <th className="px-4 py-2 text-sm">Start Date</th>
                   <th className="px-4 py-2 text-sm">End Date</th>
-                  <th className="px-4 py-2 text-sm">Client</th>
+                  <th className="px-4 py-2 text-sm">Client Name</th>
                 </tr>
               </thead>
               <tbody>
@@ -191,8 +191,12 @@ function Demo() {
                         {project.projectName}
                       </td>
                       <td className="px-4 py-2 text-sm text-center">
-                        {project.status}
-                      </td>
+  {project.status === "In Progress" ? "🚀 In Progress" : 
+   project.status === "On Hold" ? "⏳ On Hold" : 
+   project.status === "New Project" ? "✉️ New Project" : project.status}
+</td>
+
+
                       <td className="px-4 py-2 text-sm text-center">
                         {project.progress}%
                       </td>
