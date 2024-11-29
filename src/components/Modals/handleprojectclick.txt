@@ -1,0 +1,77 @@
+const handleEditProject = async () => {
+  if (
+    projectDetails.projectName &&
+    projectDetails.details &&
+    projectDetails.status &&
+    projectDetails.progress &&
+    projectDetails.startDate &&
+    projectDetails.endDate &&
+    projectDetails.client
+  ) {
+    try {
+      // Construct API URL based on selected category for editing
+      const apiUrl =
+        selectedCategory === "All Projects"
+          ? `http://localhost:4000/category/allProjects/${projectDetails.id}` // Assuming `id` is the identifier of the project
+          : `http://localhost:4000/category/${encodeURIComponent(selectedCategory)}/${projectDetails.id}`;
+
+      // Prepare request body
+      const requestBody = {
+        projectName: projectDetails.projectName,
+        details: projectDetails.details,
+        status: projectDetails.status,
+        progress: projectDetails.progress,
+        startDate: projectDetails.startDate,
+        endDate: projectDetails.endDate,
+        client: projectDetails.client,
+        categoryName: selectedCategory, // Include categoryName when it's not "All Projects"
+      };
+
+      // Make the PUT request to edit the project
+      const response = await axios.put(apiUrl, requestBody);
+      console.log("Response data:", response.data); // Log the response
+
+      if (response.data.success) {
+        // Update the project in the list with the edited data
+        const updatedProject = response.data.project; // The updated project returned from the response
+        setProjects((prevProjects) =>
+          prevProjects.map((project) =>
+            project.id === updatedProject.id ? updatedProject : project
+          )
+        );
+
+        // Close modal and reset form
+        setModalOpen(false);
+        setProjectDetails({
+          projectName: "",
+          details: "",
+          status: "",
+          progress: "",
+          startDate: "",
+          endDate: "",
+          client: "",
+          category: "",
+        });
+      } else {
+        console.error(
+          "Failed to edit project: ",
+          response.data.message || "Unknown error"
+        );
+        alert(response.data.message || "Failed to edit project.");
+      }
+    } catch (error) {
+      console.error("Error editing project:", error);
+      alert("An error occurred while editing the project.");
+    }
+  } else {
+    alert("Please fill all fields.");
+  }
+};
+
+// Modify the handleProjectClick to open the modal with existing project details for editing
+const handleProjectClick = (project) => {
+  setModalType("project");
+  setProjectDetails(project); // Set the project details to be edited
+  console.log(project);
+  setModalOpen(true);
+};

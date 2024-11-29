@@ -8,6 +8,7 @@ const Modal = ({
   setNewCategory,
   newProject,
   handleInputChange,
+  handleEditInputChange,
   handleAddCategory,
   handleAddProject,
   projectDetails,
@@ -68,7 +69,7 @@ const Modal = ({
                   value={
                     isEditing ? projectDetails.projectName : newProject.name
                   }
-                  onChange={handleInputChange}
+                  onChange={isEditing ? handleEditInputChange:handleInputChange}
                   className="w-full border p-2 rounded"
                 />
               </div>

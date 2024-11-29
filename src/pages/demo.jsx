@@ -77,21 +77,24 @@ const CategoryAndProjectList = () => {
     fetchProjects();
   }, [selectedCategory]); // Re-fetch projects whenever `selectedCategory` changes
 
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    if (name === "status" && value === "✉️ New Project") {
-      setNewProject({
-        ...newProject,
-        [name]: value,
-        progress: 0,
-      });
-    } else {
+    const handleInputChange = (e) => {
+      console.log('adding')
+      const { name, value } = e.target;
       setNewProject((prev) => ({
         ...prev,
         [name]: value,
       }));
-    }
-  };
+    };
+    const handleEditInputChange = (e) => {
+      const { name, value } = e.target;
+      console.log("Before update:", projectDetails); // Check current state
+      setProjectDetails((prevDetails) => ({
+        ...prevDetails,
+        [name]: value,
+      }));
+      console.log("After update:", projectDetails); // Check updated state
+    };
+      
 
   const handleAddCategory = async () => {
     if (newCategory.trim()) {
@@ -210,6 +213,7 @@ const CategoryAndProjectList = () => {
   const handleProjectClick = (project) => {
     setModalType("project");
     setProjectDetails(project);
+    console.log(project);
     setModalOpen(true);
   };
 
@@ -360,6 +364,7 @@ const CategoryAndProjectList = () => {
         handleInputChange={handleInputChange}
         handleAddCategory={handleAddCategory}
         handleAddProject={handleAddProject}
+        handleEditInputChange={handleEditInputChange}
         projectDetails={projectDetails} // Pass project details to modal
       />
     </div>
