@@ -1,7 +1,7 @@
 import { BrowserRouter as Router,Routes,Route } from "react-router-dom";
 import React from "react";
 import Homepage from "./pages/homepage";
-import Task from "./pages/task";
+import TaskDemo from "./pages/task";
 import Chats from "./pages/chats";
 import Projects from "./pages/project";
 import Notifications from "./pages/notifications";
@@ -14,7 +14,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/" element={<Homepage />} />
-        <Route path="/task" element={<Task />} />
+        <Route path="/task" element={<TaskDemo />} />
         <Route path="/chats" element={<Chats />} />
         <Route path="/project" element={<Projects />} />
         <Route path="/notifications" element={<Notifications />} />

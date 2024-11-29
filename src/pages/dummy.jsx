@@ -1,18 +1,28 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import Dashboard from "../components/Dashboard";
+import Modal from "../components/Modals/addProjectModal";
 import FolderIcon from "@mui/icons-material/Folder";
-import AddCategoryModal from "../components/Modals/addCategoryModal";
-import AddProjectModal from "../components/Modals/addProjectModal";
-import UpdateProjectModal from "../components/Modals/updateProjectModal";
-function Demo() {
-  const [projects, setProjects] = useState([]); // State to store tasks
-  const [projectId, setProjectId] = useState(null); // Task ID for updating
-  const [modalType, setModalType] = useState(""); // Modal type to handle different modals
-  const [isModalOpen, setIsModalOpen] = useState(false); // Modal visibility state
-  const [categories, setCategories] = useState([]); // State to store categories
+
+const CategoryAndProjectList = () => {
+  const [categories, setCategories] = useState([]);
+  const [projects, setProjects] = useState([]); // Flat array of projects
   const [selectedCategory, setSelectedCategory] = useState("All Projects");
-  const [selectedProject,setSelectedProject]=useState(null)
+  const [error, setError] = useState(null);
+  const [modalOpen, setModalOpen] = useState(false);
+  const [modalType, setModalType] = useState("");
+  const [newCategory, setNewCategory] = useState("");
+  const [projectDetails, setProjectDetails] = useState("");
+  const [newProject, setNewProject] = useState({
+    name: "",
+    details: "",
+    status: "",
+    progress: "",
+    startDate: "",
+    endDate: "",
+    client: "",
+    category: "",
+  });
 
   // Fetch categories and projects
   useEffect(() => {
@@ -26,15 +36,17 @@ function Demo() {
         if (Array.isArray(categoryResponse.data.categories)) {
           setCategories(categoryResponse.data.categories);
         } else {
-          alert("Categories data is not an array");
+          setError("Categories data is not an array");
         }
       } catch (err) {
         console.error("Error fetching categories:", err);
+        setError(err.message);
       }
     };
 
     fetchCategories();
-  }, []);
+  }, []); // Run only once to fetch categories
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -63,10 +75,28 @@ function Demo() {
     };
 
     fetchProjects();
-  }, [selectedCategory]);
+  }, [selectedCategory]); // Re-fetch projects whenever `selectedCategory` changes
 
-  // Function to handle adding a category (you can implement it later)
-  const handleAddCategory = async (newCategory) => {
+    const handleInputChange = (e) => {
+      console.log('adding')
+      const { name, value } = e.target;
+      setNewProject((prev) => ({
+        ...prev,
+        [name]: value,
+      }));
+    };
+    const handleEditInputChange = (e) => {
+      const { name, value } = e.target;
+      console.log("Before update:", projectDetails); // Check current state
+      setProjectDetails((prevDetails) => ({
+        ...prevDetails,
+        [name]: value,
+      }));
+      console.log("After update:", projectDetails); // Check updated state
+    };
+      
+
+  const handleAddCategory = async () => {
     if (newCategory.trim()) {
       try {
         const response = await axios.post("http://localhost:4000/category", {
@@ -74,7 +104,8 @@ function Demo() {
         });
         if (response.data.success) {
           setCategories([...categories, response.data.category]); // Add the newly created category
-          setModalType(""); // Close the modal
+          setNewCategory(""); // Clear the input field
+          setModalOpen(false); // Close the modal
         } else {
           alert(response.data.message || "Failed to add category.");
         }
@@ -87,8 +118,106 @@ function Demo() {
     }
   };
 
+  const handleAddProject = async () => {
+    if (
+      newProject.name &&
+      newProject.details &&
+      newProject.status &&
+      newProject.progress &&
+      newProject.startDate &&
+      newProject.endDate &&
+      newProject.client
+    ) {
+      try {
+        // Construct API URL based on selected category
+        const apiUrl =
+          selectedCategory === "All Projects"
+            ? "http://localhost:4000/category/allProjects"
+            : `http://localhost:4000/category/${encodeURIComponent(
+                selectedCategory
+              )}`;
+  
+        // Prepare request body
+        const requestBody =
+          selectedCategory === "All Projects"
+            ? {
+                projectName: newProject.name,
+                details: newProject.details,
+                status: newProject.status,
+                progress: newProject.progress,
+                startDate: newProject.startDate,
+                endDate: newProject.endDate,
+                client: newProject.client,
+              }
+            : {
+                categoryName: selectedCategory, // Include categoryName when it's not "All Projects"
+                projectName: newProject.name,
+                details: newProject.details,
+                status: newProject.status,
+                progress: newProject.progress,
+                startDate: newProject.startDate,
+                endDate: newProject.endDate,
+                client: newProject.client,
+              };
+  
+        // Make the POST request
+        const response = await axios.post(apiUrl, requestBody);
+        console.log("Response data:", response.data); // Log the response
+  
+        if (response.data.success) {
+          if (response.data.project) {
+            // Handle response for "All Projects" or when only a single project is returned
+            const addedProject = response.data.project; // The newly created project from response
+            setProjects((prevProjects) => [...prevProjects, addedProject]); // Add the new project to the list
+          } else if (
+            response.data.category &&
+            response.data.category.projects
+          ) {
+            // Handle response for specific category
+            const newProject =
+              response.data.category.projects[
+                response.data.category.projects.length - 1
+              ]; // Last project is the newly added one
+            setProjects((prevProjects) => [...prevProjects, newProject]);
+          }
+  
+          // Close modal and reset form
+          setModalOpen(false);
+          setNewProject({
+            name: "",
+            details: "",
+            status: "",
+            progress: "",
+            startDate: "",
+            endDate: "",
+            client: "",
+            category: "",
+          });
+        } else {
+          console.error(
+            "Failed to add project: ",
+            response.data.message || "Unknown error"
+          );
+          alert(response.data.message || "Failed to add project.");
+        }
+      } catch (error) {
+        console.error("Error adding project:", error);
+        alert("An error occurred while adding the project.");
+      }
+    } else {
+      alert("Please fill all fields.");
+    }
+  };
+  
 
+  const handleProjectClick = (project) => {
+    setModalType("project");
+    setProjectDetails(project);
+    console.log(project);
+    setModalOpen(true);
+  };
 
+  // Render UI
   return (
     <div className="flex bg-gray-200">
       {/* Sidebar with Dashboard */}
@@ -99,13 +228,14 @@ function Demo() {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col bg-white rounded-2xl mt-3 ml-3 mr-3 overflow-hidden">
         <div className="flex items-center justify-between p-7">
-          <h1 className="text-3xl font-extrabold ml-2">💻 Projects</h1>
+          <h1 className="text-3xl font-extrabold ml-2">Projects</h1>
         </div>
-
         <hr className="h-px bg-gray-300 border-0 mb-4" />
+
         <div className="flex flex-grow overflow-y-auto">
-          {/* Category list */}
+          {/* Category List */}
           <div className="w-[200px] bg-white p-4 border-r border-gray-300 overflow-y-auto">
+            {/* "All Projects" */}
             <div
               key="all-projects"
               className={`mb-1 font-semibold flex items-center cursor-pointer p-2 rounded-2xl ${
@@ -118,9 +248,10 @@ function Demo() {
               <div className="truncate">All Projects</div>
             </div>
 
-            {categories.map((category, index) => (
+            {/* Render Categories */}
+            {categories.map((category) => (
               <div
-                key={index}
+                key={category.categoryName}
                 className={`mb-1 font-semibold flex items-center cursor-pointer p-2 rounded-2xl ${
                   selectedCategory === category.categoryName
                     ? "bg-gray-100 text-blue-600"
@@ -128,36 +259,37 @@ function Demo() {
                 }`}
                 onClick={() => setSelectedCategory(category.categoryName)}
               >
-                {category !== "All Projects" && (
-                  <span className="mr-2 text-blue-500">
-                    <FolderIcon />
-                  </span>
-                )}
+                <span className="mr-2 text-blue-500">
+                  <FolderIcon />
+                </span>
                 <div className="truncate">{category.categoryName}</div>
               </div>
             ))}
 
+            {/* Add Category */}
             <div>
               <span
                 className="mb-1 ml-2 text-xs font-base text-gray-700 flex items-center cursor-pointer p-3 rounded-2xl"
                 onClick={() => {
-                  setIsModalOpen(true); // Open the modal
-                  setModalType("addCategory"); // Set modal type to 'addCategory'
+                  setModalOpen(true);
+                  setModalType("category");
                 }}
               >
-                + add project category
+                + Add Project Category
               </span>
             </div>
           </div>
-          {/* Project list */}
+
+          {/* Projects List */}
           <div className="flex-1 bg-white p-6 overflow-y-auto">
             <div className="flex items-center justify-between w-full">
               <h2 className="text-2xl font-bold mb-4">{selectedCategory}</h2>
               <button
                 className="bg-green-600 hover:bg-green-700 text-white text-sm mb-4 font-medium py-2 px-4 rounded-full"
                 onClick={() => {
-                  setIsModalOpen(true);
-                  setModalType("addProject");
+                  setModalOpen(true);
+                  setModalType("project");
+                  setProjectDetails(null);
                 }}
               >
                 + Add new
@@ -180,12 +312,7 @@ function Demo() {
                     <tr
                       key={index}
                       className="cursor-pointer"
-                      onClick={()=>{
-                        setSelectedProject(project);  // Set the selected project
-    setIsModalOpen(true);
-    setModalType("updateProject");
-    // Open the modal
-                      }}
+                      onClick={() => handleProjectClick(project)}
                     >
                       <td className="px-4 py-2 text-sm text-start w-2/6">
                         {project.projectName}
@@ -227,43 +354,21 @@ function Demo() {
           </div>
         </div>
       </div>
-      {/* Modal Handling */}
-      {isModalOpen && modalType === "addCategory" && (
-        <AddCategoryModal
-          isOpen={isModalOpen}
-          onClose={() => {
-            setIsModalOpen(false); // Close the modal
-            setModalType(""); // Reset modal type
-          }}
-          onSave={handleAddCategory} // Pass the save handler for AddCategory
-        />
-      )}
-      {isModalOpen && modalType === "addProject" && (
-        <AddProjectModal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false); // Close the modal
-          setModalType(""); // Reset modal type
-        }}
-        selectedCategory={selectedCategory}
-        setProjects={setProjects}// Pass the save handler for AddCategory
-        />
-      )}
-      {isModalOpen && modalType === "updateProject" && (
-       <UpdateProjectModal
-       isOpen={isModalOpen}
-       onClose={() => {
-        setSelectedProject(null); 
-        setIsModalOpen(false); // Close the modal
-        setModalType(""); // Reset modal type
-      }}
-      selectedCategory={selectedCategory}
-      selectedProject={selectedProject}  // Pass the selected project here
-       setProjects={setProjects}
-     />
-      )}
+      <Modal
+        modalOpen={modalOpen}
+        setModalOpen={setModalOpen}
+        modalType={modalType}
+        newCategory={newCategory}
+        setNewCategory={setNewCategory}
+        newProject={newProject}
+        handleInputChange={handleInputChange}
+        handleAddCategory={handleAddCategory}
+        handleAddProject={handleAddProject}
+        handleEditInputChange={handleEditInputChange}
+        projectDetails={projectDetails} // Pass project details to modal
+      />
     </div>
   );
-}
+};
 
-export default Demo;
+export default CategoryAndProjectList;
