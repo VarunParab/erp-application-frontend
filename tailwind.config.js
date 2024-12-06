@@ -1,6 +1,9 @@
 module.exports = {
   mode: "jit",
   content: ["./src/**/*.{js,jsx,ts,tsx}"],
+  daisyui: {
+    themes: ["light"],
+  },
   theme: {
     extend: {
       colors: {
@@ -11,6 +14,7 @@ module.exports = {
   },
   plugins: [
     require('@tailwindcss/line-clamp'),
-    require('@tailwindcss/forms'), // Add this plugin
+    require('@tailwindcss/forms'),
+    require('daisyui'),
   ],
 };

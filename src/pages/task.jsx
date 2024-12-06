@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import Dashboard from "../components/Dashboard";
+import Dashboard from "../components/dashboard";
 import TaskModal from "../components/Modals/taskModal";
 import UpdateTaskModal from "../components/Modals/updateTaskModal";
 
@@ -61,26 +61,32 @@ function TaskDemo() {
   };
 
   return (
-    <div className="flex bg-gray-200">
-      <div className="w-[242.01px]">
-        <Dashboard />
-      </div>
-      <div className="min-h-screen p-7 w-full bg-white rounded-2xl mt-3 ml-3 mr-3">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl ml-2 font-extrabold">✅ Tasks</h1>
-          <button
-            onClick={() => {
-              setIsModalOpen(true);
-              setModalType('add')
-            }}
-            className="bg-blue-500 text-white px-4 py-2 rounded-2xl shadow hover:bg-blue-600"
-          >
-            + Add New
-          </button>
-        </div>
-        <div className="relative overflow-x-auto shadow-md sm:rounded-lg mt-4">
-          <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
-            <thead className="text-xs text-black uppercase bg-gray-200">
+    <div className="flex bg-gray-200 fixed w-full h-full">
+  {/* Sidebar with Dashboard */}
+  <div className="w-[242px] h-full bg-gray-200 shadow-lg">
+    <Dashboard />
+  </div>
+
+  {/* Main Content Area */}
+  <div className="flex-1 p-7 bg-white rounded-2xl mt-3 ml-3 mr-3">
+  {/* Header Section */}
+  <div className="flex justify-between items-center">
+    <h1 className="text-3xl ml-2 font-extrabold">✅ Tasks</h1>
+    <button
+      onClick={() => {
+        setIsModalOpen(true);
+        setModalType("add");
+      }}
+      className="bg-blue-500 text-white px-4 py-2 rounded-2xl shadow hover:bg-blue-600"
+    >
+      + Add New
+    </button>
+  </div>
+
+  {/* Scrollable Table */}
+  <div className="relative overflow-y-auto shadow-md sm:rounded-lg mt-4" style={{ maxHeight: "calc(100vh - 150px)" }}>
+    <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+      <thead className="text-xs text-black uppercase bg-gray-200">
               <tr>
                 <th scope="col" className="p-4"></th>
                 <th scope="col" className="px-6 py-3">

@@ -2,10 +2,12 @@ import { Icon } from "@mui/material";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import DashboardIcon from "@mui/icons-material/Dashboard";
-import Dashboard from "../components/Dashboard";
+import Dashboard from "../components/dashboard";
 import DateProfile from "../components/dateprofile";
+import { useAuthStore } from "../store/useAuthStore";
 
 const Homepage = () => {
+  const {logout} = useAuthStore();
   let progressBarColor;
   const progress = 20;
   if (progress < 40) {
@@ -17,7 +19,7 @@ const Homepage = () => {
   }
 
   // Initial countdown time in seconds (for example, 10 seconds)
-  const initialTime = 0;
+  const initialTime = 10000;
   const [timeLeft, setTimeLeft] = useState(initialTime);
 
   useEffect(() => {
@@ -38,7 +40,7 @@ const Homepage = () => {
   const seconds = timeLeft % 60;
 
   return (
-    <div className="flex bg-gray-200" style={{ maxHeight: "100vh", overflowY: "auto" }}>
+    <div className="flex bg-gray-200 fixed w-full">
       <div className="w-[242.01px]">
         <Dashboard />
       </div>
@@ -51,6 +53,9 @@ const Homepage = () => {
             <h1 className="text-3xl font-extrabold ml-2">Dashboard</h1>
           </div>
           {/* Hi, User with profile circle and dummy photo */}
+          <button className="flex gap-2 items-end" onClick={logout}>
+                  <span className="hidden sm:inline">Logout</span>
+                </button>
           <DateProfile />
 
         </div>
@@ -59,14 +64,18 @@ const Homepage = () => {
           {/* -----Reverse Countdown ----------*/}
           <div className="bg-white text-black p-6 rounded-3xl shadow-md sm:w-full h-[180px] md:w-[340px] border-solid border-2 border-gray-200">
             <h1 className="text-2xl font-bold mb-4">⏱️ Reverse Countdown</h1>
-            <h4 className="text-5xl font-extrabold text-center mt-8">
-              {timeLeft > 0
-                ? `${String(hours).padStart(2, "0")}:${String(minutes).padStart(
-                    2,
-                    "0"
-                  )}:${String(seconds).padStart(2, "0")}`
-                : "Time's up!"}
-            </h4>
+            <h4 className="text-center mt-8">
+  {timeLeft > 0 ? (
+    <span className="countdown font-extrabold text-5xl">
+      <span style={{ "--value": hours }}></span>:
+      <span style={{ "--value": minutes }}></span>:
+      <span style={{ "--value": seconds }}></span>
+    </span>
+  ) : (
+    <span className="text-2xl font-extrabold">Time's up!</span>
+  )}
+</h4>
+
           </div>
           {/* -------Current Task ----------*/}
           <div className="bg-yellow-100 text-black p-6 rounded-3xl shadow-md sm:w-full h-[180px] md:w-[340px] border-solid border-2 border-yellow-300">

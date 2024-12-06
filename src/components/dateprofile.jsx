@@ -57,7 +57,7 @@ const DateProfile = () => {
 
       {/* Profile Block */}
       <div className="flex items-center bg-white py-1 px-1.5 rounded-2xl shadow-md">
-        <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-gray-300">
+        <div className="w-12 -12 rounded-full overflow-hidden border-2 border-gray-300">
           <img
             src="https://imgv3.fotor.com/images/gallery/a-man-profile-picture-with-blue-and-green-background-made-by-LinkedIn-Profile-Picture-Maker.jpg"
             alt="User Profile"

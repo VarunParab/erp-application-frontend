@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import Dashboard from "../components/Dashboard";
+import Dashboard from "../components/dashboard";
 import ArchiveOutlinedIcon from '@mui/icons-material/ArchiveOutlined';
 import ArchiveIcon from '@mui/icons-material/Archive';
   

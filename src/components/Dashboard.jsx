@@ -8,9 +8,11 @@ import FolderIcon from "@mui/icons-material/Folder";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import SummarizeIcon from "@mui/icons-material/Summarize";
 import { useState } from "react";
+//import { useAuthStore } from "../store/AuthStore";
 
 const Dashboard = () => {
   const [open, setOpen] = useState(true);
+  //const { logout } = useAuthStore();
   const location = useLocation(); // Get the current route
 
   const Menus = [
@@ -29,42 +31,47 @@ const Dashboard = () => {
       <div
         className={`${
           open ? "w-72" : "w-20"
-        } bg-red-700 h-screen p-5 rounded-2xl pt-8 relative duration-300 mt-3 ml-3 mb-3`}
+        } bg-red-700 h-screen p-5 rounded-2xl pt-8 relative duration-300 mt-3 ml-3 mb-3 flex flex-col justify-between`}
       >
-        <div className="flex gap-x-4 items-center">
-          <h1
-            className={`text-white origin-left font-medium text-xl font-extrabold duration-200 ${
-              !open && "scale-0"
-            }`}
-          >
-            Digital Vasai
-          </h1>
-        </div>
-        <ul className="pt-6">
-          {Menus.map((Menu, index) => (
-            <li
-              key={index}
-              className={`flex rounded-md p-2 cursor-pointer text-white text-sm items-center gap-x-4 
-                ${
-                  location.pathname === Menu.path // Match current path with menu's path
-                    ? "bg-light-white"
-                    : "hover:bg-light-white"
-                }`}
+        {/* Sidebar Header */}
+        <div>
+          <div className="flex gap-x-4 items-center">
+            <h1
+              className={`text-white origin-left font-medium text-xl font-extrabold duration-200 ${
+                !open && "scale-0"
+              }`}
             >
-              <Link
-                to={Menu.path || "#"}
-                className="flex items-center gap-x-4 w-full"
+              Digital Vasai
+            </h1>
+          </div>
+
+          {/* Sidebar Menu Items */}
+          <ul className="pt-6 overflow-y-auto">
+            {Menus.map((Menu, index) => (
+              <li
+                key={index}
+                className={`flex rounded-md p-2 cursor-pointer text-white text-sm items-center gap-x-4 
+                  ${
+                    location.pathname === Menu.path // Match current path with menu's path
+                      ? "bg-light-white"
+                      : "hover:bg-light-white"
+                  }`}
               >
-                <span className="text-sm">{Menu.icon}</span>
-                <h3
-                  className={`${!open && "hidden"} origin-left duration-200 text-l`}
+                <Link
+                  to={Menu.path || "#"}
+                  className="flex items-center gap-x-4 w-full"
                 >
-                  {Menu.title}
-                </h3>
-              </Link>
-            </li>
-          ))}
-        </ul>
+                  <span className="text-sm">{Menu.icon}</span>
+                  <h3
+                    className={`${!open && "hidden"} origin-left duration-200 text-l`}
+                  >
+                    {Menu.title}
+                  </h3>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </div>
   );
