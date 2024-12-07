@@ -1,10 +1,30 @@
 import { X } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useChatStore } from "../../store/useChatStore";
+import { Search } from "lucide-react";
+import { useState } from "react";
 
 const ChatHeader = () => {
   const { selectedUser, setSelectedUser } = useChatStore();
+  const { setSearchTerm } = useChatStore();  // Access searchTerm from the store
   const { onlineUsers } = useAuthStore();
+  // State to toggle the search input field visibility
+  const [isSearchVisible, setIsSearchVisible] = useState(false);
+
+  // Function to handle the search button click
+  const toggleSearch = () => {
+    setIsSearchVisible((prev) => {
+      if (prev) {
+        // If search box is being closed, clear the search term
+        setSearchTerm("");
+      }
+      return !prev;
+    });
+  };
+  const handleSearchChange = (event) => {
+    setSearchTerm(event.target.value);  // Update the searchTerm in the store directly
+  };
+
 
   return (
     <div className="p-2.5 border-b border-gray-300">
@@ -26,12 +46,30 @@ const ChatHeader = () => {
           </div>
         </div>
 
-        {/* Close button */}
-        <button onClick={() => setSelectedUser(null)}>
-          <X />
-        </button>
+        {/* Button Container for Search and Close */}
+        <div className="flex items-center gap-4">
+          {/* Search Input Field */}
+          {isSearchVisible && (
+            <input
+              type="text"
+              placeholder="Search messages..."
+              className="p-2 border rounded-3xl w-72" // Adjust the width to be smaller
+              onChange={handleSearchChange}
+            />
+          )}
+          {/* Search button */}
+          <button onClick={toggleSearch}>
+            <Search />
+          </button>
+
+          {/* X (Close) button */}
+          <button onClick={() => setSelectedUser(null)}>
+            <X />
+          </button>
+        </div>
       </div>
     </div>
   );
 };
+
 export default ChatHeader;

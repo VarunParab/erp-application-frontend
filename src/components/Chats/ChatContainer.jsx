@@ -5,20 +5,24 @@ import MessageSkeleton from "../skeletons/MessageSkeleton.jsx";
 import ChatHeader from "./ChatHeader.jsx";
 import MessageInput from "./MessageInput.jsx";
 import { formatMessageTime } from "../../lib/utils.js";
+
 function ChatContainer() {
   const {
     messages,
+    searchTerm,
     getMessages,
     isMessageLoading,
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
   } = useChatStore();
+
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
+
+  // Fetch messages and subscribe to updates
   useEffect(() => {
     getMessages(selectedUser._id);
-
     subscribeToMessages();
 
     return () => unsubscribeFromMessages();
@@ -28,12 +32,25 @@ function ChatContainer() {
     subscribeToMessages,
     unsubscribeFromMessages,
   ]);
-
+  
+  // Scroll to the latest message when messages are updated
   useEffect(() => {
     if (messageEndRef.current && messages) {
       messageEndRef.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
+
+  // Function to highlight search term in message text
+  const highlightText = (text) => {
+    if (!searchTerm) return text; // No highlighting if there's no search term
+    const parts = text.split(new RegExp(`(${searchTerm})`, 'gi')); // Split text around searchTerm
+    return parts.map((part, index) => 
+      part.toLowerCase() === searchTerm.toLowerCase() ? (
+        <span key={index} className="bg-yellow-200">{part}</span> // Highlighted text
+      ) : part
+    );
+  };
+
   if (isMessageLoading) {
     return (
       <div className="flex-1 flex flex-col overflow-auto">
@@ -43,6 +60,7 @@ function ChatContainer() {
       </div>
     );
   }
+
   return (
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
@@ -56,7 +74,7 @@ function ChatContainer() {
             }`}
             ref={messageEndRef}
           >
-            <div className=" chat-image avatar">
+            <div className="chat-image avatar">
               <div className="w-8 h-8 rounded-full border">
                 <img
                   src={
@@ -80,7 +98,6 @@ function ChatContainer() {
                   : "bg-gray-200 text-black"
               }`}
             >
-              {" "}
               {message.image && (
                 <img
                   src={message.image}
@@ -88,7 +105,7 @@ function ChatContainer() {
                   className="sm:max-w-[200px] rounded-md mb-2"
                 />
               )}
-              {message.text && <p>{message.text}</p>}
+              {message.text && <p>{highlightText(message.text)}</p>} {/* Use highlightText here */}
             </div>
           </div>
         ))}
@@ -98,4 +115,5 @@ function ChatContainer() {
     </div>
   );
 }
+
 export default ChatContainer;

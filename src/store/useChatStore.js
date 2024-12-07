@@ -10,6 +10,8 @@ export const useChatStore = create((set, get) => ({
   isUsersLoading: false,
   isMessagesLoading: false,
 
+  setSearchTerm: (searchTerm) => set({ searchTerm }),  // Set searchTerm globally
+
   getUsers: async () => {
     set({ isUsersLoading: true });
     try {
