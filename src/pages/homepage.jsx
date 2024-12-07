@@ -19,7 +19,7 @@ const Homepage = () => {
   }
 
   // Initial countdown time in seconds (for example, 10 seconds)
-  const initialTime = 10000;
+  const initialTime = 0;
   const [timeLeft, setTimeLeft] = useState(initialTime);
 
   useEffect(() => {
@@ -72,7 +72,7 @@ const Homepage = () => {
       <span style={{ "--value": seconds }}></span>
     </span>
   ) : (
-    <span className="text-2xl font-extrabold">Time's up!</span>
+    <span className="text-4xl font-extrabold">Time's up!</span>
   )}
 </h4>
 

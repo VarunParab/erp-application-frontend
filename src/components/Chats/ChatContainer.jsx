@@ -1,10 +1,10 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useChatStore } from "../../store/useChatStore";
-import { useAuthStore } from "../../store/useAuthStore.js";
-import MessageSkeleton from "../skeletons/MessageSkeleton.jsx";
-import ChatHeader from "./ChatHeader.jsx";
-import MessageInput from "./MessageInput.jsx";
-import { formatMessageTime } from "../../lib/utils.js";
+import { useAuthStore } from "../../store/useAuthStore";
+import MessageSkeleton from "../skeletons/MessageSkeleton";
+import ChatHeader from "./ChatHeader";
+import MessageInput from "./MessageInput";
+import { formatMessageTime } from "../../lib/utils";
 
 function ChatContainer() {
   const {
@@ -15,12 +15,16 @@ function ChatContainer() {
     selectedUser,
     subscribeToMessages,
     unsubscribeFromMessages,
+    highlightedIndexes,
+    currentIndex,
+    setCurrentIndex,
   } = useChatStore();
 
   const { authUser } = useAuthStore();
-  const messageEndRef = useRef(null);
 
-  // Fetch messages and subscribe to updates
+  // Dynamic refs for each message
+  const messageRefs = useRef([]);
+
   useEffect(() => {
     getMessages(selectedUser._id);
     subscribeToMessages();
@@ -32,22 +36,27 @@ function ChatContainer() {
     subscribeToMessages,
     unsubscribeFromMessages,
   ]);
-  
-  // Scroll to the latest message when messages are updated
-  useEffect(() => {
-    if (messageEndRef.current && messages) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-    }
-  }, [messages]);
 
-  // Function to highlight search term in message text
+  useEffect(() => {
+    if (highlightedIndexes.length > 0 && currentIndex >= 0) {
+      const messageToScroll = messageRefs.current[highlightedIndexes[currentIndex]];
+      messageToScroll?.scrollIntoView({ behavior: "smooth", block: "center" });
+    }
+  }, [highlightedIndexes, currentIndex]);
+
   const highlightText = (text) => {
-    if (!searchTerm) return text; // No highlighting if there's no search term
-    const parts = text.split(new RegExp(`(${searchTerm})`, 'gi')); // Split text around searchTerm
-    return parts.map((part, index) => 
+    if (!searchTerm) return text;
+
+    // Create a regular expression to match the search term
+    const regex = new RegExp(`(${searchTerm})`, "gi");
+    return text.split(regex).map((part, index) =>
       part.toLowerCase() === searchTerm.toLowerCase() ? (
-        <span key={index} className="bg-yellow-200">{part}</span> // Highlighted text
-      ) : part
+        <span key={index} className="bg-yellow-300">
+          {part}
+        </span>
+      ) : (
+        part
+      )
     );
   };
 
@@ -66,13 +75,13 @@ function ChatContainer() {
       <ChatHeader />
 
       <div className="flex-1 overflow-y-auto p-4 space-y-4">
-        {messages.map((message) => (
+        {messages.map((message, index) => (
           <div
             key={message._id}
             className={`chat ${
               message.senderId === authUser._id ? "chat-end" : "chat-start"
             }`}
-            ref={messageEndRef}
+            ref={(el) => (messageRefs.current[index] = el)} // Assign ref dynamically
           >
             <div className="chat-image avatar">
               <div className="w-8 h-8 rounded-full border">
@@ -105,7 +114,7 @@ function ChatContainer() {
                   className="sm:max-w-[200px] rounded-md mb-2"
                 />
               )}
-              {message.text && <p>{highlightText(message.text)}</p>} {/* Use highlightText here */}
+              {message.text && <p>{highlightText(message.text)}</p>}
             </div>
           </div>
         ))}

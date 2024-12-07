@@ -60,238 +60,173 @@ const ProgressBarWithText = ({ progress }) => {
   
   export default ProgressBarWithText;
   
+import React, { useEffect, useRef, useState } from "react";
+import { useChatStore } from "../../store/useChatStore";
+import { useAuthStore } from "../../store/useAuthStore.js";
+import MessageSkeleton from "../skeletons/MessageSkeleton.jsx";
+import ChatHeader from "./ChatHeader.jsx";
+import MessageInput from "./MessageInput.jsx";
+import { formatMessageTime } from "../../lib/utils.js";
 
+function ChatContainer() {
+  const {
+    messages,
+    searchTerm,
+    getMessages,
+    isMessageLoading,
+    selectedUser,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  } = useChatStore();
 
-//grid Row
-import React from "react";
-import Dashboard from "../components/dashboard";
+  const { authUser } = useAuthStore();
+  const messageEndRef = useRef(null);
 
-// Reusable TaskCard Component
-const TaskCard = ({ content }) => (
-  <div className="bg-white text-black p-4 rounded-2xl shadow-md w-[265px] flex items-center justify-center">
-    {content}
-  </div>
-);
+  //const [highlightedIndexes, setHighlightedIndexes] = useState([]); // Store the indexes of highlighted text
+  //const [currentIndex, setCurrentIndex] = useState(0); // Store the current index of highlighted text
 
-const Task = () => {
-  // Define task data for each category
-  const tasks = {
-    New: ["Task1", "Task 2", "Task 3", "Task 4"],
-    InProgress: ["Task 1", "Task 2", "Task 3"],
-    Overdue: ["Task 1", "Task 2"],
-    Completed: ["Task 1"],
-  };
-  // Find the maximum number of tasks in any category to set the row count
-  const maxTasks = Math.max(...Object.values(tasks).map(category => category.length));
+  useEffect(() => {
+    getMessages(selectedUser._id);
 
-  return (
-    <div className="flex">
-      {/* Sidebar with Dashboard */}
-      <div className="w-[242.01px]">
-        <Dashboard />
-      </div>
+    subscribeToMessages();
 
-      {/* Main Content Area */}
-      <div className="min-h-screen p-7 w-full bg-gray-200 rounded-2xl mt-3 ml-3 mr-3">
-        {/* Header */}
-        <div className="flex items-center justify-between w-full">
-          <h1 className="text-3xl font-extrabold ml-2">Tasks</h1>
-          <button className="bg-green-600 hover:bg-green-700 text-white text-sm mt-1 font-medium py-2 px-4 rounded-full">
-            + Add new
-          </button>
-        </div>
+    return () => unsubscribeFromMessages();
+  }, [
+    selectedUser._id,
+    getMessages,
+    subscribeToMessages,
+    unsubscribeFromMessages,
+  ]);
 
-        <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-400" />
+  useEffect(() => {
+    if (messageEndRef.current && messages) {
+      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages]);
 
-        {/* Categories Header */}
-        <div className="grid grid-cols-4 gap-2 text-center">
-          {["New Task", "In progress", "Overdue", "Completed"].map((category, index) => (
-            <div key={index} className="col-span-1 font-semibold">{category}</div>
-          ))}
-        </div>
+  //////useEffect(() => {
+    if (searchTerm) {
+      const indexes = [];
+      // Find all indexes of the search term in the messages
+      messages.forEach((message, idx) => {
+        if (message.text && message.text.toLowerCase().includes(searchTerm.toLowerCase())) {
+          indexes.push(idx); // Add index to the list
+        }
+      });
+      setHighlightedIndexes(indexes);
+      setCurrentIndex(0); // Reset to the first highlighted message
+    } else {
+      setHighlightedIndexes([]); // Clear highlighted indexes when searchTerm is cleared
+    }
+  }, [searchTerm, messages]);/////
 
-        <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-400" />
+  ///////const navigateHighlight = (direction) => {
+    if (highlightedIndexes.length === 0) return; // No highlighted messages
 
-        {/* Task Grid */}
-        <div className="grid grid-cols-4 gap-4">
-          {Object.keys(tasks).map((category, index) => (
-            <div key={index} className="grid gap-4">
-              {tasks[category].map((task, i) => (
-                <TaskCard content={task} key={i} />
-              ))}
-              {/* Only render empty placeholders if there are fewer tasks than maxTasks */}
-              {tasks[category].length < maxTasks && 
-                Array.from({ length: maxTasks - tasks[category].length }).map((_, i) => (
-                  <div key={`empty-placeholder-${i}`} className="w-[265px] h-[100px]"></div>
-                ))
-              }
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-};
+    let newIndex = currentIndex + direction;
 
-export default Task;
+    // Ensure newIndex stays within bounds
+    if (newIndex < 0) newIndex = highlightedIndexes.length - 1;
+    if (newIndex >= highlightedIndexes.length) newIndex = 0;
 
+    setCurrentIndex(newIndex);
+    const messageToScroll = highlightedIndexes[newIndex];
+    messageEndRef.current?.scrollIntoView({ behavior: "smooth" }); // Scroll to the highlighted message
+  };//////
 
-///tasks
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Dashboard from "../components/dashboard";
-const TaskCard = ({ content, category, label, dueDate }) => {
-  const [isChecked, setIsChecked] = useState(false);
+  const highlightText = (text) => {
+    if (!searchTerm) return text;
 
-  const bgColor = {
-    Completed: "bg-green-200 border-solid border-2 border-green-300",
-    Overdue: "bg-gray-300 border-solid border-2 border-gray-300",
-    InProgress: "bg-yellow-100 border-solid border-2 border-yellow-300",
-    New: "bg-blue-100 border-solid border-2 border-blue-300",
+    // Create a regular expression to match the search term
+    const regex = new RegExp(`(${searchTerm})`, "gi");
+    return text.split(regex).map((part, index) =>
+      part.toLowerCase() === searchTerm.toLowerCase() ? (
+        <span key={index} className="bg-yellow-300">{part}</span>
+      ) : (
+        part
+      )
+    );
   };
 
-  const handleCheckboxChange = async() => {
-    setIsChecked(!isChecked);
-
-    if (!isChecked) {
-      try {
-        // Call the backend to delete the task
-        await axios.delete(`http://localhost:4000/tasks/${task._id}`);
-        onTaskDeleted(task._id); // Notify parent to update the task list
-      } catch (error) {
-        console.error("Error deleting task:", error);
-      }
-    }  };
-
-  if (isChecked) {
-    return null; // When checked, return null to hide the TaskCard completely
+  if (isMessageLoading) {
+    return (
+      <div className="flex-1 flex flex-col overflow-auto">
+        <ChatHeader />
+        <MessageSkeleton />
+        <MessageInput />
+      </div>
+    );
   }
 
   return (
-    <div
-      className={`text-black p-4 rounded-2xl shadow-md w-[240px] h-[140px] ${bgColor[category]} flex flex-col relative ml-6`}
-    >
-      {/* Title with truncation */}
-      <div
-        className={`font-semibold text-sm overflow-hidden text-ellipsis line-clamp-2 ${
-          category === "Completed" ? "w-full" : "pr-8"
-        }`}
-      >
-        {content}
-      </div>
+    <div className="flex-1 flex flex-col overflow-auto">
+      <ChatHeader />
 
-      {/* Conditionally render checkbox based on category */}
-      {category !== "Completed" && (
-        <div
-          className="absolute top-2 right-2 w-6 h-6 bg-white border-2 border-gray-500 rounded-lg flex items-center justify-center"
-          onClick={handleCheckboxChange}
-        >
-          <input
-            type="checkbox"
-            checked={isChecked}
-            onChange={handleCheckboxChange}
-            className="appearance-none w-4 h-4 rounded-sm checked:bg-green-500 checked:border-transparent"
-          />
-        </div>
-      )}
-
-      {/* Label and Due Date */}
-      <div className="mt-4 mr-2 flex items-center justify-start">
-        {label ? (
-          <div
-            className={`text-white text-xs px-2 py-1 rounded-lg ${
-              label === "Completed"
-                ? "bg-green-500"
-                : label === "ASAP"
-                ? "bg-red-500"
-                : "bg-blue-500"
-            }`}
+      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+        {/* Render Up and Down buttons */}
+       /// <div className="flex justify-between mb-4">
+          <button
+            className="p-2 border rounded-full"
+            onClick={() => navigateHighlight(-1)}
+            disabled={highlightedIndexes.length === 0}
           >
-            {label}
-          </div>
-        ) : (
-          <div className="h-6" /> // Placeholder for spacing when label is empty
-        )}
-      </div>
-      <div className="mt-2 text-xs text-gray-500">{dueDate}</div>
-    </div>
-  );
-};
-function Taskdemo() {
-  const [tasks, setTasks] = useState([]); // Initialize as an empty array
-
-  useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const response = await axios.get("http://localhost:4000/tasks");
-        const tasksArray = response.data;
-
-        // Group tasks by category
-        const groupedTasks = tasksArray.reduce((acc, task) => {
-          if (!acc[task.category]) {
-            acc[task.category] = [];
-          }
-          acc[task.category].push(task);
-          return acc;
-        }, {});
-
-        setTasks(groupedTasks); // Set the grouped tasks
-      } catch (error) {
-        console.error("Error fetching tasks:", error);
-      }
-    };
-
-    fetchTasks();
-  }, []);
-
-  return (
-    <div className="flex bg-gray-100">
-      {/* Sidebar with Dashboard */}
-      <div className="w-[242.01px]">
-        <Dashboard />
-      </div>
-
-      {/* Main Content Area */}
-      <div className="min-h-screen p-7 w-full bg-white rounded-2xl mt-3 ml-3 mr-3">
-        <div className="flex items-center justify-between w-full">
-          <h1 className="text-3xl font-extrabold ml-2">Tasks</h1>
-          <button className="bg-green-600 hover:bg-green-700 text-white text-sm mt-1 font-medium py-2 px-4 rounded-full">
-            + Add new
+            Up
           </button>
-        </div>
+          <button
+            className="p-2 border rounded-full"
+            onClick={() => navigateHighlight(1)}
+            disabled={highlightedIndexes.length === 0}
+          >
+            Down
+          </button>
+        </div>////
 
-        <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-400" />
-
-        {/* Categories Header */}
-        <div className="grid grid-cols-4 gap-2 text-center">
-          {["New Task", "In progress", "Overdue", "Completed"].map(
-            (category, index) => (
-              <div key={index} className="col-span-1 font-semibold">
-                {category}
-              </div>
-            )
-          )}
-        </div>
-        <hr className="h-px my-3 bg-gray-200 border-0 dark:bg-gray-400" />
-        <div className="grid grid-cols-4 gap-4 divide-x divide-gray-300">
-          {Object.keys(tasks).map((category, index) => (
-            <div key={index} className="grid gap-4">
-              {/* Render each task in the category */}
-              {tasks[category]?.map((task, i) => (
-                <TaskCard
-                  content={task.content}
-                  category={category}
-                  label={task.label}
-                  dueDate={task.duedate} // Ensure consistent casing of keys
-                  key={task._id} // Use a unique key
+        {messages.map((message, index) => (
+          <div
+            key={message._id}
+            className={`chat ${message.senderId === authUser._id ? "chat-end" : "chat-start"}`}
+            ref={index === highlightedIndexes[currentIndex] ? messageEndRef : null}
+          >
+            <div className="chat-image avatar">
+              <div className="w-8 h-8 rounded-full border">
+                <img
+                  src={
+                    message.senderId === authUser._id
+                      ? authUser.profilePic || "/avatar.png"
+                      : selectedUser.profilePic || "/avatar.png"
+                  }
+                  alt="profile pic"
                 />
-              ))}
+              </div>
             </div>
-          ))}
-        </div>
+            <div className="chat-header mb-1">
+              <time className="text-xs opacity-50 ml-1">
+                {formatMessageTime(message.createdAt)}
+              </time>
+            </div>
+            <div
+              className={`chat-bubble flex flex-col ${
+                message.senderId === authUser._id
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200 text-black"
+              }`}
+            >
+              {message.image && (
+                <img
+                  src={message.image}
+                  alt="Attachment"
+                  className="sm:max-w-[200px] rounded-md mb-2"
+                />
+              )}
+              {message.text && <p>{highlightText(message.text)}</p>}
+            </div>
+          </div>
+        ))}
       </div>
+
+      <MessageInput />
     </div>
   );
 }
 
-export default Taskdemo;
+export default ChatContainer;

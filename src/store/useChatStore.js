@@ -5,12 +5,44 @@ import { useAuthStore } from "./useAuthStore";
 
 export const useChatStore = create((set, get) => ({
   messages: [],
+  searchTerm: "", // Initialize as an empty string
+  highlightedIndexes: [], // Initialize as an empty array
+  currentIndex: 0, // Index of the currently highlighted message
   users: [],
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
 
-  setSearchTerm: (searchTerm) => set({ searchTerm }),  // Set searchTerm globally
+  setSearchTerm: (term) => {
+    set((state) => {
+      const indexes = [];
+      state.messages.forEach((message, idx) => {
+        if (message.text && message.text.toLowerCase().includes(term.toLowerCase())) {
+          indexes.push(idx);
+        }
+      });
+      return {
+        searchTerm: term,
+        highlightedIndexes: indexes,
+        currentIndex: indexes.length > 0 ? 0 : -1,
+      };
+    });
+  },
+
+  setCurrentIndex: (index) => set({ currentIndex: index }),
+
+  navigateHighlight: (direction) =>
+    set((state) => {
+      if (state.highlightedIndexes.length === 0) return state;
+
+      let newIndex = state.currentIndex + direction;
+
+      // Ensure newIndex stays within bounds
+      if (newIndex < 0) newIndex = state.highlightedIndexes.length - 1;
+      if (newIndex >= state.highlightedIndexes.length) newIndex = 0;
+
+      return { currentIndex: newIndex };
+    }),
 
   getUsers: async () => {
     set({ isUsersLoading: true });

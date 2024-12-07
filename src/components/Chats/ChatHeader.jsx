@@ -1,10 +1,14 @@
 import { X } from "lucide-react";
+import { ChevronUp } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { useAuthStore } from "../../store/useAuthStore";
 import { useChatStore } from "../../store/useChatStore";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
+
 const ChatHeader = () => {
+  const { navigateHighlight, highlightedIndexes } = useChatStore();
   const { selectedUser, setSelectedUser } = useChatStore();
   const { setSearchTerm } = useChatStore();  // Access searchTerm from the store
   const { onlineUsers } = useAuthStore();
@@ -50,13 +54,34 @@ const ChatHeader = () => {
         <div className="flex items-center gap-4">
           {/* Search Input Field */}
           {isSearchVisible && (
-            <input
-              type="text"
-              placeholder="Search messages..."
-              className="p-2 border rounded-3xl w-72" // Adjust the width to be smaller
-              onChange={handleSearchChange}
-            />
-          )}
+  <div className="relative w-72"> {/* Relative container to position items */}
+    <input
+      type="text"
+      placeholder="Search messages..."
+      className="p-2 border rounded-3xl w-full pr-10" // Add padding-right for icons
+      onChange={handleSearchChange}
+    />
+
+    {/* Chevron Up Icon */}
+    <button className="absolute right-8 top-2 cursor-pointer" onClick={() => navigateHighlight(-1)}>
+      <ChevronUp
+        className={`w-6 h-6 ${
+          highlightedIndexes.length === 0 ? "text-gray-400" : "text-black"
+        }`} // Adjust icon color based on disabled state
+      />
+    </button>
+
+    {/* Chevron Down Icon */}
+    <button className="absolute right-2 top-2 cursor-pointer" onClick={() => navigateHighlight(1)}>
+      <ChevronDown
+        className={`w-6 h-6 ${
+          highlightedIndexes.length === 0 ? "text-gray-400" : "text-black"
+        }`} // Adjust icon color based on disabled state
+      />
+    </button>
+  </div>
+)}
+
           {/* Search button */}
           <button onClick={toggleSearch}>
             <Search />
