@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import { useChatStore } from "../../store/useChatStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import MessageSkeleton from "../skeletons/MessageSkeleton";
@@ -17,25 +17,21 @@ function ChatContainer() {
     unsubscribeFromMessages,
     highlightedIndexes,
     currentIndex,
-    setCurrentIndex,
   } = useChatStore();
 
   const { authUser } = useAuthStore();
 
-  // Dynamic refs for each message
-  const messageRefs = useRef([]);
+  const messageRefs = useRef([]); // Dynamic refs for each message
+  const messageEndRef = useRef(null); // Ref for scrolling to the last message
 
   useEffect(() => {
-    getMessages(selectedUser._id);
-    subscribeToMessages();
+    if (selectedUser?._id) {
+      getMessages(selectedUser._id);
+      subscribeToMessages();
+    }
 
     return () => unsubscribeFromMessages();
-  }, [
-    selectedUser._id,
-    getMessages,
-    subscribeToMessages,
-    unsubscribeFromMessages,
-  ]);
+  }, [selectedUser, getMessages, subscribeToMessages, unsubscribeFromMessages]);
 
   useEffect(() => {
     if (highlightedIndexes.length > 0 && currentIndex >= 0) {
@@ -44,10 +40,15 @@ function ChatContainer() {
     }
   }, [highlightedIndexes, currentIndex]);
 
+  useEffect(() => {
+    if (messageEndRef.current) {
+      messageEndRef.current.scrollIntoView({ behavior: "auto" });
+    }
+  }, [messages]);
+
   const highlightText = (text) => {
     if (!searchTerm) return text;
 
-    // Create a regular expression to match the search term
     const regex = new RegExp(`(${searchTerm})`, "gi");
     return text.split(regex).map((part, index) =>
       part.toLowerCase() === searchTerm.toLowerCase() ? (
@@ -81,8 +82,9 @@ function ChatContainer() {
             className={`chat ${
               message.senderId === authUser._id ? "chat-end" : "chat-start"
             }`}
-            ref={(el) => (messageRefs.current[index] = el)} // Assign ref dynamically
+            ref={(el) => (messageRefs.current[index] = el)} // Ref for each message
           >
+            {/* Profile picture */}
             <div className="chat-image avatar">
               <div className="w-8 h-8 rounded-full border">
                 <img
@@ -95,11 +97,15 @@ function ChatContainer() {
                 />
               </div>
             </div>
+
+            {/* Message header */}
             <div className="chat-header mb-1">
               <time className="text-xs opacity-50 ml-1">
                 {formatMessageTime(message.createdAt)}
               </time>
             </div>
+
+            {/* Message content */}
             <div
               className={`chat-bubble flex flex-col ${
                 message.senderId === authUser._id
@@ -107,6 +113,7 @@ function ChatContainer() {
                   : "bg-gray-200 text-black"
               }`}
             >
+              {/* Attachment */}
               {message.image && (
                 <img
                   src={message.image}
@@ -114,10 +121,13 @@ function ChatContainer() {
                   className="sm:max-w-[200px] rounded-md mb-2"
                 />
               )}
+              {/* Highlighted text */}
               {message.text && <p>{highlightText(message.text)}</p>}
             </div>
           </div>
         ))}
+        {/* Scroll to the last message */}
+        <div ref={messageEndRef} />
       </div>
 
       <MessageInput />
