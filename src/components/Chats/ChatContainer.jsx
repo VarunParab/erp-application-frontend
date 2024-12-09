@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useChatStore } from "../../store/useChatStore";
 import { useAuthStore } from "../../store/useAuthStore";
 import MessageSkeleton from "../skeletons/MessageSkeleton";
@@ -23,6 +23,8 @@ function ChatContainer() {
 
   const messageRefs = useRef([]); // Dynamic refs for each message
   const messageEndRef = useRef(null); // Ref for scrolling to the last message
+
+  const [selectedImage, setSelectedImage] = useState(null); // State to track selected image
 
   useEffect(() => {
     if (selectedUser?._id) {
@@ -59,6 +61,14 @@ function ChatContainer() {
         part
       )
     );
+  };
+
+  const handleImageClick = (imageUrl) => {
+    setSelectedImage(imageUrl); // Set the clicked image to the state
+  };
+
+  const closeImagePreview = () => {
+    setSelectedImage(null); // Close the image preview by resetting the state
   };
 
   if (isMessageLoading) {
@@ -118,7 +128,8 @@ function ChatContainer() {
                 <img
                   src={message.image}
                   alt="Attachment"
-                  className="sm:max-w-[200px] rounded-md mb-2"
+                  className="sm:max-w-[200px] rounded-md mb-2 cursor-pointer"
+                  onClick={() => handleImageClick(message.image)} // Handle image click
                 />
               )}
               {/* Highlighted text */}
@@ -131,6 +142,28 @@ function ChatContainer() {
       </div>
 
       <MessageInput />
+      
+      {/* Image Preview Modal */}
+      {selectedImage && (
+        <div
+          className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50"
+          onClick={closeImagePreview} // Close image when clicking on the background
+        >
+          <div className="relative max-w-3xl max-h-full">
+            <img
+              src={selectedImage}
+              alt="Enlarged Image"
+              className="max-w-full max-h-full object-contain"
+            />
+            <button
+              className="absolute top-2 right-2 text-white bg-black px-2 py-1 rounded-full"
+              onClick={closeImagePreview} // Close image preview when clicking the close button
+            >
+              X
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ function Profile() {
       </div>
 
       {/* Main Content Area */}
-      <div className="flex-1 ml-50 p-7 overflow-y-auto h-screen bg-white rounded-2xl mt-3 ml-3 mr-3">
+      <div className="flex-1 ml-50 p-7 h-screen bg-white rounded-2xl mt-3 ml-3 mr-3">
         <h1 className="text-2xl font-extrabold ml-3 mb-4">👤 Profile</h1>
         <div className="grid grid-rows-3 gap-4 h-full">
           {/* Row 1 */}
