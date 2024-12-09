@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 
 const ProfileCard = () => {
-  const [profileImage, setProfileImage] = useState(
-    "" // Default placeholder image
+  const [profileImage, setProfileImage] = useState("/profile.png" // Default placeholder image
   );
 
   // Handle image upload
