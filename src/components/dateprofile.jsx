@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
-
+import { Link } from "react-router-dom";
+import {useAuthStore} from "../store/useAuthStore"
 const DateProfile = () => {
+  const {authUser} = useAuthStore();
   const [currentDate, setCurrentDate] = useState({
     day: "",
     date: "",
@@ -56,14 +58,14 @@ const DateProfile = () => {
       </div>
 
       {/* Profile Block */}
-      <div className="flex items-center bg-white py-1 px-1.5 rounded-2xl shadow-md">
-        <div className="w-12 -12 rounded-full overflow-hidden border-2 border-gray-300">
+      <div className="flex items-center bg-white py-1 px-2 rounded-2xl shadow-md">
+        <Link to="/profile" className="w-12 -12 rounded-full overflow-hidden">
           <img
-            src="https://imgv3.fotor.com/images/gallery/a-man-profile-picture-with-blue-and-green-background-made-by-LinkedIn-Profile-Picture-Maker.jpg"
-            alt="User Profile"
+          src={authUser.profilePic || "/avatar.png"}
+          alt="User Profile"
             className="w-full h-full object-cover"
           />
-        </div>
+        </Link>
       </div>
     </div>
   );

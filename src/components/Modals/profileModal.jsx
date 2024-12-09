@@ -1,20 +1,26 @@
 import React, { useState } from "react";
+import { useAuthStore } from "../../store/useAuthStore";
+import { Camera, Mail, User } from "lucide-react";
 
 const ProfileCard = () => {
-  const [profileImage, setProfileImage] = useState("/profile.png" // Default placeholder image
-  );
+  const { authUser, isUpdatingProfile, updateProfile } = useAuthStore();
+  const [selectedImg, setSelectedImg] = useState(null);
 
   // Handle image upload
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = () => {
-        setProfileImage(reader.result); // Update the profile image state
-      };
-      reader.readAsDataURL(file); // Read the file as a Data URL
-    }
+    if (!file) return;
+
+    const reader = new FileReader();
+
+    reader.readAsDataURL(file);
+
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      setSelectedImg(base64Image);
+      await updateProfile({ profilePic: base64Image });
   };
+}
 
   return (
     <div className="col-span-1 max-h-72 bg-white border-solid border-2 border-gray-100 rounded-3xl shadow-md p-4 flex flex-col items-center justify-center">
@@ -23,15 +29,15 @@ const ProfileCard = () => {
         {/* Profile Picture */}
         <div className="w-[180px] h-[180px] bg-gray-300 rounded-full flex items-center justify-center overflow-hidden">
           <img
-            src={profileImage}
-            alt="Profile"
+             src={selectedImg || authUser.profilePic || "/avatar.png"}
+              alt="Profile"
             className="w-full h-full object-cover rounded-full"
           />
         </div>
         {/* Pencil Icon */}
         <label
-          htmlFor="imageUpload"
-          className="absolute bottom-2 right-4 bg-white p-2 rounded-full shadow-lg hover:bg-gray-200 cursor-pointer"
+              htmlFor="avatar-upload"
+              className={`absolute bottom-2 right-4 bg-white p-2 rounded-full shadow-lg hover:bg-gray-200 cursor-pointer ${isUpdatingProfile ? "animate-pulse pointer-events-none" : ""}`}
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -55,16 +61,17 @@ const ProfileCard = () => {
         </label>
         {/* Hidden Input for Image Upload */}
         <input
-          id="imageUpload"
-          type="file"
-          accept="image/*"
-          onChange={handleImageUpload}
-          className="hidden"
+         type="file"
+         id="avatar-upload"
+         className="hidden"
+         accept="image/*"
+         onChange={handleImageUpload}
+         disabled={isUpdatingProfile}
         />
       </div>
 
       {/* Name */}
-      <h2 className="mt-4 text-lg font-semibold">John Doe</h2>
+      <h2 className="mt-4 text-lg font-semibold">{authUser.fullName}</h2>
 
       {/* Position */}
       <p className="text-gray-500 text-sm">Software Engineer</p>

@@ -1,11 +1,10 @@
-import React, { useState } from "react";
-import { useAuthStore } from "../store/useAuthStore";
+import React from "react";
 import Dashboard from "../components/dashboard";
-import { Camera, Mail, User } from "lucide-react";
 import ProfileCard from "../components/Modals/profileModal";
+
 function Profile() {
   return (
-    <div className="flex bg-gray-200 fixed w-full">
+    <div className="flex bg-gray-200">
       {/* Sidebar with Dashboard */}
       <div className="w-[242.01px]">
         <Dashboard />
@@ -14,38 +13,15 @@ function Profile() {
       {/* Main Content Area */}
       <div className="flex-1 ml-50 p-7 overflow-y-auto h-screen bg-white rounded-2xl mt-3 ml-3 mr-3">
         <h1 className="text-2xl font-extrabold ml-3 mb-4">👤 Profile</h1>
+
+        {/* Grid Container */}
         <div className="grid grid-rows-3 gap-4 h-full">
           {/* Row 1 */}
           <div className="grid grid-cols-3 gap-4">
+            {/* Small Grid */}
             <ProfileCard />
-            {/* <div className="relative">
-            <img
-              src={selectedImg || authUser.profilePic || "/avatar.png"}
-              alt="Profile"
-              className="size-32 rounded-full object-cover border-4 "
-            />
-            <label
-              htmlFor="avatar-upload"
-              className={`
-            absolute bottom-0 right-0 
-            bg-base-content hover:scale-105
-            p-2 rounded-full cursor-pointer 
-            transition-all duration-200
-            ${isUpdatingProfile ? "animate-pulse pointer-events-none" : ""}
-          `}
-            >
-              <Camera className="w-5 h-5 text-base-200" />
-              <input
-                type="file"
-                id="avatar-upload"
-                className="hidden"
-                accept="image/*"
-                onChange={handleImageUpload}
-                disabled={isUpdatingProfile}
-              />
-            </label>
-          </div> */}
-            {/* large grid */}
+
+            {/* Large Grid */}
             <div className="col-span-2 h-[680px] bg-white border-solid border-2 border-gray-100 rounded-3xl shadow-md p-4">
               <h2 className="text-lg font-bold">Your Details</h2>
 
@@ -130,6 +106,7 @@ function Profile() {
             </div>
           </div>
 
+          {/* Row 2 */}
           <div className="grid grid-cols-3 gap-4">
             {/* Small Grid Below the ProfileCard */}
             <div className="h-[360px] bg-white mt-16 border-solid border-2 border-gray-100 rounded-3xl shadow-md p-4">
@@ -173,4 +150,5 @@ function Profile() {
     </div>
   );
 }
+
 export default Profile;

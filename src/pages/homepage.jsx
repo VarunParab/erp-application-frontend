@@ -7,7 +7,7 @@ import DateProfile from "../components/dateprofile";
 import { useAuthStore } from "../store/useAuthStore";
 
 const Homepage = () => {
-  const {logout} = useAuthStore();
+  const { logout } = useAuthStore();
   let progressBarColor;
   const progress = 20;
   if (progress < 40) {
@@ -48,16 +48,18 @@ const Homepage = () => {
       <div className="flex-1 ml-50 p-7 overflow-y-auto h-screen bg-white rounded-2xl mt-3 ml-3 mr-3">
         <div className="headingdash flex items-center justify-between">
           <div className="flex items-center">
-            <DashboardIcon className="text-2xl" style={{ marginRight: "2px" }} />{" "}
+            <DashboardIcon
+              className="text-2xl"
+              style={{ marginRight: "2px" }}
+            />{" "}
             {/* Icon with spacing */}
             <h1 className="text-3xl font-extrabold ml-2">Dashboard</h1>
           </div>
           {/* Hi, User with profile circle and dummy photo */}
           <button className="flex gap-2 items-end" onClick={logout}>
-                  <span className="hidden sm:inline">Logout</span>
-                </button>
+            <span className="hidden sm:inline">Logout</span>
+          </button>
           <DateProfile />
-
         </div>
         {/* -----Grids ----------*/}
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4 mt-6">
@@ -65,17 +67,16 @@ const Homepage = () => {
           <div className="bg-white text-black p-6 rounded-3xl shadow-md sm:w-full h-[180px] md:w-[340px] border-solid border-2 border-gray-200">
             <h1 className="text-2xl font-bold mb-4">⏱️ Reverse Countdown</h1>
             <h4 className="text-center mt-8">
-  {timeLeft > 0 ? (
-    <span className="countdown font-extrabold text-5xl">
-      <span style={{ "--value": hours }}></span>:
-      <span style={{ "--value": minutes }}></span>:
-      <span style={{ "--value": seconds }}></span>
-    </span>
-  ) : (
-    <span className="text-4xl font-extrabold">Time's up!</span>
-  )}
-</h4>
-
+              {timeLeft > 0 ? (
+                <span className="countdown font-extrabold text-5xl">
+                  <span style={{ "--value": hours }}></span>:
+                  <span style={{ "--value": minutes }}></span>:
+                  <span style={{ "--value": seconds }}></span>
+                </span>
+              ) : (
+                <span className="text-4xl font-extrabold">Time's up!</span>
+              )}
+            </h4>
           </div>
           {/* -------Current Task ----------*/}
           <div className="bg-yellow-100 text-black p-6 rounded-3xl shadow-md sm:w-full h-[180px] md:w-[340px] border-solid border-2 border-yellow-300">
@@ -109,7 +110,9 @@ const Homepage = () => {
           <div className="bg-red-200 text-black p-6 rounded-3xl shadow-md sm:w-full h-[180px] md:w-[340px] border-solid border-2 border-red-300">
             <h1 className="text-2xl font-bold mb-4">⏰ Upcoming Deadline</h1>
             <ul>
-              <li className="text-1xl font-semibold">E-commerce Web Application</li>
+              <li className="text-1xl font-semibold">
+                E-commerce Web Application
+              </li>
               <li className="text-sm">Status: Development</li>
               <br />
               <li className="text-xs">Due: 7-11-2024</li>
@@ -125,17 +128,23 @@ const Homepage = () => {
             <br />
             <ul>
               <li className="text-1xl font-bold">Typography</li>
-              <li className="text-sm mt-1 truncate">Define Typography Standards</li>
+              <li className="text-sm mt-1 truncate">
+                Define Typography Standards
+              </li>
             </ul>
             <br />
             <ul>
               <li className="text-1xl font-bold">Iconography</li>
-              <li className="text-sm mt-1 truncate">Set Iconography Guidelines</li>
+              <li className="text-sm mt-1 truncate">
+                Set Iconography Guidelines
+              </li>
             </ul>
             <br />
             <ul>
               <li className="text-1xl font-bold">Patterns</li>
-              <li className="text-sm mt-1 truncate">Mapout Interaction Patterns</li>
+              <li className="text-sm mt-1 truncate">
+                Mapout Interaction Patterns
+              </li>
             </ul>
           </div>
           {/* -------project status ----------*/}
