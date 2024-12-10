@@ -1,12 +1,16 @@
-import React from "react";
+import React,{useEffect} from "react";
 import { useChatStore } from "../store/useChatStore";
 import Sidebar from "../components/Chats/Sidebar";
 import ChatContainer from "../components/Chats/ChatContainer";
 import NoChatSelected from "../components/Chats/NoChatSelected";
 import Dashboard from "../components/dashboard";
 function Chats(){
-  const { selectedUser } = useChatStore();
-
+  const { selectedUser,setSelectedUser,users } = useChatStore();
+  useEffect(() => {
+    if (users.length > 0 && !selectedUser) {
+      setSelectedUser(users[0]); // Select the first user from the list
+    }
+  }, [users, selectedUser]);
   return (
     <div className="flex bg-gray-200 fixed w-full">
       {/* Sidebar with Dashboard */}
@@ -22,8 +26,8 @@ function Chats(){
           <div className="flex h-full rounded-lg overflow-hidden">
             <Sidebar />
 
-            {!selectedUser ? <NoChatSelected /> : <ChatContainer />}
-          </div>
+            {selectedUser ? <ChatContainer user={selectedUser} /> : <NoChatSelected />}
+            </div>
         </div>
       </div>
     </div>
