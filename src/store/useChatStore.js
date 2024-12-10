@@ -12,6 +12,7 @@ export const useChatStore = create((set, get) => ({
   selectedUser: null,
   isUsersLoading: false,
   isMessagesLoading: false,
+  notifications: {}, // Tracks unread messages for each user { userId: count }
 
   setSearchTerm: (term) => {
     set((state) => {
@@ -83,13 +84,31 @@ export const useChatStore = create((set, get) => ({
     const socket = useAuthStore.getState().socket;
 
     socket.on("newMessage", (newMessage) => {
+      const { selectedUser, addNotification } = get(); // Get the store state and addNotification method
+    
       const isMessageSentFromSelectedUser = newMessage.senderId === selectedUser._id;
-      if (!isMessageSentFromSelectedUser) return;
-
-      set({
-        messages: [...get().messages, newMessage],
-      });
+    
+      if (isMessageSentFromSelectedUser) {
+        set({
+          messages: [...get().messages, newMessage],
+        });
+      } else {
+        addNotification(newMessage.senderId); // Update unread messages count for the sender
+        toast.success(`New message from ${newMessage.senderName}`);
+      }
     });
+    
+  },
+  addNotification: (userId) => set((state) => {
+    const notifications = { ...state.notifications };
+    notifications[userId] = (notifications[userId] || 0) + 1; // Increment unread count
+    return { notifications };
+  }),
+  clearNotifications: (userId) => {
+    const { notifications } = get();
+    const updatedNotifications = { ...notifications };
+    delete updatedNotifications[userId];
+    set({ notifications: updatedNotifications });
   },
 
   unsubscribeFromMessages: () => {
