@@ -5,21 +5,16 @@ import path from "path";
 // https://vitejs.dev/config/
 export default defineConfig({
   plugins: [react()],
-  resolve: {
-    alias: {
-      '@': '/src', // Alias for cleaner imports
-    },
-  },
   server: {
-    host: "digitalvasai.com", // Set host to your custom domain
-    port: 80, // Default HTTP port
+    // port: 8001,
   },
   build: {
     rollupOptions: {
-      input: "index.html", // Explicitly define input
+      // Explicitly define input for Rollup to resolve correctly
+      input: "index.html",
     },
   },
   optimizeDeps: {
-    include: ["hoist-non-react-statics"], // Pre-bundle dependencies
+    include: ["hoist-non-react-statics"],
   },
 });
